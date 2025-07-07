@@ -10,6 +10,7 @@ import { store, persister } from 'store';
 import * as serviceWorker from 'serviceWorker';
 import reportWebVitals from 'reportWebVitals';
 import { ConfigProvider } from 'contexts/ConfigContext';
+import QueryProvider from 'e-courrier/providers/QueryProvider';
 
 // style + assets
 import 'assets/scss/style.scss';
@@ -40,9 +41,11 @@ const root = createRoot(document.getElementById('root'));
 root.render(
     <Provider store={store}>
         <PersistGate loading={null} persistor={persister}>
-            <ConfigProvider>
-                <App />
-            </ConfigProvider>
+            <QueryProvider>
+                <ConfigProvider>
+                    <App />
+                </ConfigProvider>
+            </QueryProvider>
         </PersistGate>
     </Provider>
 );
