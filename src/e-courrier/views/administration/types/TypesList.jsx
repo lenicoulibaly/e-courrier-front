@@ -22,6 +22,7 @@ import {
 // project imports
 import { ThemeMode } from 'config';
 import { useTypes } from '../../../hooks/query/useTypes';
+import Pagination from '../../../components/commons/Pagination';
 
 // assets
 import EditIcon from '@mui/icons-material/Edit';
@@ -31,33 +32,16 @@ import EditIcon from '@mui/icons-material/Edit';
 const TypesList = ({ searchTerm, privilegeTypeCode, onEditType }) => {
     const theme = useTheme();
     const [filteredTypes, setFilteredTypes] = useState([]);
+    const [page, setPage] = useState(0);
+    const [pageSize, setPageSize] = useState(3);
 
-    // Fetch types using the useTypes hook
-    const { data: typesPage, isLoading, isError, error } = useTypes();
+    // Fetch types using the useTypes hook with pagination
+    const { data: typesPage, isLoading, isError, error } = useTypes({ page: page, size: pageSize, key: searchTerm });
     const types = typesPage?.content;
     // Filter types based on search term and privilegeTypeCode
     useEffect(() => {
         if (types) {
             let filtered = [...types];
-            
-            // Filter by search term
-            if (searchTerm) {
-                const searchLower = searchTerm.toLowerCase();
-                filtered = filtered.filter(
-                    (type) => 
-                        type.code?.toLowerCase().includes(searchLower) || 
-                        type.label?.toLowerCase().includes(searchLower) ||
-                        type.description?.toLowerCase().includes(searchLower)
-                );
-            }
-            
-            // Filter by privilegeTypeCode
-            if (privilegeTypeCode) {
-                filtered = filtered.filter(
-                    (type) => type.privilegeTypeCode === privilegeTypeCode
-                );
-            }
-            
             setFilteredTypes(filtered);
         }
     }, [types, searchTerm, privilegeTypeCode]);
@@ -67,6 +51,17 @@ const TypesList = ({ searchTerm, privilegeTypeCode, onEditType }) => {
         if (onEditType) {
             onEditType(type);
         }
+    };
+
+    // Handle page change
+    const handlePageChange = (newPage) => {
+        setPage(newPage);
+    };
+
+    // Handle page size change
+    const handlePageSizeChange = (newSize) => {
+        setPageSize(newSize);
+        setPage(0); // Reset to first page when changing page size
     };
 
     // Show loading state
@@ -88,55 +83,66 @@ const TypesList = ({ searchTerm, privilegeTypeCode, onEditType }) => {
     }
 
     return (
-        <TableContainer>
-            <Table>
-                <TableHead>
-                    <TableRow>
-                        <TableCell sx={{ pl: 3 }}>Code</TableCell>
-                        <TableCell>Label</TableCell>
-                        <TableCell>Description</TableCell>
-                        <TableCell>Group</TableCell>
-                        <TableCell align="center" sx={{ pr: 3 }}>
-                            Actions
-                        </TableCell>
-                    </TableRow>
-                </TableHead>
-                <TableBody>
-                    {filteredTypes.length > 0 ? (
-                        filteredTypes.map((type, index) => (
-                            <TableRow hover key={type.id || index}>
-                                <TableCell sx={{ pl: 3 }}>{type.code}</TableCell>
-                                <TableCell>
-                                    <Typography variant="subtitle1">{type.name}</Typography>
-                                </TableCell>
-                                <TableCell>{type.description}</TableCell>
-                                <TableCell>{type.groupCode}</TableCell>
-                                <TableCell align="center" sx={{ pr: 3 }}>
-                                    <Stack direction="row" justifyContent="center" alignItems="center">
-                                        <Tooltip placement="top" title="Edit">
-                                            <IconButton 
-                                                color="primary" 
-                                                aria-label="edit" 
-                                                size="large"
-                                                onClick={() => handleEdit(type)}
-                                            >
-                                                <EditIcon sx={{ fontSize: '1.1rem' }} />
-                                            </IconButton>
-                                        </Tooltip>
-                                    </Stack>
-                                </TableCell>
-                            </TableRow>
-                        ))
-                    ) : (
+        <>
+            <TableContainer sx={{ border: 1, borderColor: 'divider', borderRadius: 1, maxHeight: 440 }}>
+                <Table sx={{ minWidth: 350 }} aria-label="simple table" size="small" stickyHeader>
+                    <TableHead>
                         <TableRow>
-                            <TableCell colSpan={7} align="center">
-                                <Typography variant="subtitle1">No types found</Typography>
+                            <TableCell sx={{ pl: 3 }}>Code</TableCell>
+                            <TableCell>Label</TableCell>
+                            <TableCell>Description</TableCell>
+                            <TableCell>Group</TableCell>
+                            <TableCell align="center" sx={{ pr: 3 }}>
+                                Actions
                             </TableCell>
                         </TableRow>
-                    )}
-                </TableBody>
-            </Table>
-        </TableContainer>
+                    </TableHead>
+                    <TableBody>
+                        {filteredTypes.length > 0 ? (
+                            filteredTypes.map((type, index) => (
+                                <TableRow hover key={type.id || index}>
+                                    <TableCell sx={{ pl: 3 }}>{type.code}</TableCell>
+                                    <TableCell>
+                                        <Typography variant="subtitle1">{type.name}</Typography>
+                                    </TableCell>
+                                    <TableCell>{type.description}</TableCell>
+                                    <TableCell>{type.groupCode}</TableCell>
+                                    <TableCell align="center" sx={{ pr: 3 }}>
+                                        <Stack direction="row" justifyContent="center" alignItems="center">
+                                            <Tooltip placement="top" title="Edit">
+                                                <IconButton 
+                                                    color="primary" 
+                                                    aria-label="edit" 
+                                                    size="large"
+                                                    onClick={() => handleEdit(type)}
+                                                >
+                                                    <EditIcon sx={{ fontSize: '1.1rem' }} />
+                                                </IconButton>
+                                            </Tooltip>
+                                        </Stack>
+                                    </TableCell>
+                                </TableRow>
+                            ))
+                        ) : (
+                            <TableRow>
+                                <TableCell colSpan={7} align="center">
+                                    <Typography variant="subtitle1">No types found</Typography>
+                                </TableCell>
+                            </TableRow>
+                        )}
+                    </TableBody>
+                </Table>
+            </TableContainer>
+            {typesPage && (
+                <Pagination 
+                    totalPages={typesPage.totalPages} 
+                    currentPage={page} 
+                    onPageChange={handlePageChange}
+                    currentSize={pageSize}
+                    onSizeChange={handlePageSizeChange}
+                />
+            )}
+        </>
     );
 };
 

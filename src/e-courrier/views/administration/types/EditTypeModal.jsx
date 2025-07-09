@@ -5,11 +5,6 @@ import * as Yup from 'yup';
 
 // material-ui
 import {
-    Button,
-    Dialog,
-    DialogActions,
-    DialogContent,
-    DialogTitle,
     FormControl,
     FormHelperText,
     Grid,
@@ -22,6 +17,7 @@ import {
 // project imports
 import { gridSpacing } from 'store/constant';
 import { useUpdateType, useGetAllTypeGroups } from '../../../hooks/query/useTypes';
+import Modal from '../../../components/commons/Modal';
 
 // validation schema
 const TypeSchema = Yup.object().shape({
@@ -46,7 +42,7 @@ const TypeSchema = Yup.object().shape({
 const EditTypeModal = ({ open, handleClose, type }) => {
     // Fetch type groups for dropdown
     const { data: typeGroups = [], isLoading: isLoadingGroups } = useGetAllTypeGroups();
-    
+
     // Mutation for updating a type
     const { mutate: updateType, isLoading: isUpdating } = useUpdateType();
 
@@ -75,13 +71,20 @@ const EditTypeModal = ({ open, handleClose, type }) => {
     if (!type) return null;
 
     return (
-        <Dialog
+        <Modal
             open={open}
-            onClose={handleClose}
-            maxWidth="md"
-            fullWidth
+            handleClose={handleClose}
+            title="Edit Type"
+            width="md"
+            actionLabel="Save"
+            actionDisabled={isUpdating}
+            handleConfirmation={() => {
+                // The actual submission is handled by Formik
+                document.getElementById('edit-type-form').dispatchEvent(
+                    new Event('submit', { cancelable: true, bubbles: true })
+                );
+            }}
         >
-            <DialogTitle>Edit Type</DialogTitle>
             <Formik
                 initialValues={{
                     id: type.id || '',
@@ -97,151 +100,142 @@ const EditTypeModal = ({ open, handleClose, type }) => {
                 enableReinitialize
             >
                 {({ errors, touched, handleChange, handleBlur, values, isSubmitting }) => (
-                    <Form>
-                        <DialogContent>
-                            <Grid container spacing={gridSpacing}>
-                                <Grid item xs={12} md={6}>
-                                    <Field
-                                        as={TextField}
-                                        fullWidth
-                                        id="code"
-                                        name="code"
-                                        label="Code"
-                                        value={values.code}
-                                        onChange={handleChange}
-                                        onBlur={handleBlur}
-                                        error={touched.code && Boolean(errors.code)}
-                                        helperText={touched.code && errors.code}
-                                        disabled // Code should not be editable
-                                    />
-                                </Grid>
-                                <Grid item xs={12} md={6}>
-                                    <Field
-                                        as={TextField}
-                                        fullWidth
-                                        id="label"
-                                        name="label"
-                                        label="Label"
-                                        value={values.label}
-                                        onChange={handleChange}
-                                        onBlur={handleBlur}
-                                        error={touched.label && Boolean(errors.label)}
-                                        helperText={touched.label && errors.label}
-                                    />
-                                </Grid>
-                                <Grid item xs={12}>
-                                    <Field
-                                        as={TextField}
-                                        fullWidth
-                                        id="description"
-                                        name="description"
-                                        label="Description"
-                                        multiline
-                                        rows={3}
-                                        value={values.description}
-                                        onChange={handleChange}
-                                        onBlur={handleBlur}
-                                        error={touched.description && Boolean(errors.description)}
-                                        helperText={touched.description && errors.description}
-                                    />
-                                </Grid>
-                                <Grid item xs={12} md={6}>
-                                    <FormControl 
-                                        fullWidth 
-                                        error={touched.groupCode && Boolean(errors.groupCode)}
-                                    >
-                                        <InputLabel id="group-code-label">Group</InputLabel>
-                                        <Field
-                                            as={Select}
-                                            labelId="group-code-label"
-                                            id="groupCode"
-                                            name="groupCode"
-                                            label="Group"
-                                            value={values.groupCode}
-                                            onChange={handleChange}
-                                            onBlur={handleBlur}
-                                        >
-                                            {isLoadingGroups ? (
-                                                <MenuItem value="">
-                                                    <em>Loading...</em>
-                                                </MenuItem>
-                                            ) : (
-                                                typeGroups?.map((group) => (
-                                                    <MenuItem key={group.code} value={group.code}>
-                                                        {group.label}
-                                                    </MenuItem>
-                                                ))
-                                            )}
-                                        </Field>
-                                        {touched.groupCode && errors.groupCode && (
-                                            <FormHelperText>{errors.groupCode}</FormHelperText>
-                                        )}
-                                    </FormControl>
-                                </Grid>
-                                <Grid item xs={12} md={6}>
-                                    <FormControl 
-                                        fullWidth 
-                                        error={touched.privilegeTypeCode && Boolean(errors.privilegeTypeCode)}
-                                    >
-                                        <InputLabel id="privilege-type-code-label">Privilege Type</InputLabel>
-                                        <Field
-                                            as={Select}
-                                            labelId="privilege-type-code-label"
-                                            id="privilegeTypeCode"
-                                            name="privilegeTypeCode"
-                                            label="Privilege Type"
-                                            value={values.privilegeTypeCode}
-                                            onChange={handleChange}
-                                            onBlur={handleBlur}
-                                        >
-                                            {privilegeTypeCodes.map((option) => (
-                                                <MenuItem key={option.value} value={option.value}>
-                                                    {option.label}
-                                                </MenuItem>
-                                            ))}
-                                        </Field>
-                                        {touched.privilegeTypeCode && errors.privilegeTypeCode && (
-                                            <FormHelperText>{errors.privilegeTypeCode}</FormHelperText>
-                                        )}
-                                    </FormControl>
-                                </Grid>
-                                <Grid item xs={12}>
-                                    <FormControl fullWidth>
-                                        <InputLabel id="active-label">Status</InputLabel>
-                                        <Field
-                                            as={Select}
-                                            labelId="active-label"
-                                            id="active"
-                                            name="active"
-                                            label="Status"
-                                            value={values.active}
-                                            onChange={handleChange}
-                                            onBlur={handleBlur}
-                                        >
-                                            <MenuItem value={true}>Active</MenuItem>
-                                            <MenuItem value={false}>Inactive</MenuItem>
-                                        </Field>
-                                    </FormControl>
-                                </Grid>
+                    <Form id="edit-type-form">
+                        <Grid container spacing={gridSpacing}>
+                            <Grid item xs={12} md={6}>
+                                <Field
+                                    size={'small'}
+                                    as={TextField}
+                                    fullWidth
+                                    id="code"
+                                    name="code"
+                                    label="Code"
+                                    value={values.code}
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    error={touched.code && Boolean(errors.code)}
+                                    helperText={touched.code && errors.code}
+                                    disabled // Code should not be editable
+                                />
                             </Grid>
-                        </DialogContent>
-                        <DialogActions>
-                            <Button onClick={handleClose} color="primary">
-                                Cancel
-                            </Button>
-                            <Button 
-                                type="submit" 
-                                variant="contained" 
-                                color="primary"
-                                disabled={isSubmitting || isUpdating}
-                            >
-                                {isSubmitting || isUpdating ? 'Saving...' : 'Save'}
-                            </Button>
-                        </DialogActions>
+                            <Grid item xs={12} md={6}>
+                                <Field
+                                    size={'small'}
+                                    as={TextField}
+                                    fullWidth
+                                    id="label"
+                                    name="label"
+                                    label="Label"
+                                    value={values.label}
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    error={touched.label && Boolean(errors.label)}
+                                    helperText={touched.label && errors.label}
+                                />
+                            </Grid>
+                            <Grid item xs={12}>
+                                <Field
+                                    size={'small'}
+                                    as={TextField}
+                                    fullWidth
+                                    id="description"
+                                    name="description"
+                                    label="Description"
+                                    multiline
+                                    rows={3}
+                                    value={values.description}
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    error={touched.description && Boolean(errors.description)}
+                                    helperText={touched.description && errors.description}
+                                />
+                            </Grid>
+                            <Grid item xs={12} md={6}>
+                                <FormControl 
+                                    fullWidth 
+                                    error={touched.groupCode && Boolean(errors.groupCode)}
+                                >
+                                    <InputLabel id="group-code-label">Group</InputLabel>
+                                    <Field
+                                        size={'small'}
+                                        as={Select}
+                                        labelId="group-code-label"
+                                        id="groupCode"
+                                        name="groupCode"
+                                        label="Group"
+                                        value={values.groupCode}
+                                        onChange={handleChange}
+                                        onBlur={handleBlur}
+                                    >
+                                        {isLoadingGroups ? (
+                                            <MenuItem value="">
+                                                <em>Loading...</em>
+                                            </MenuItem>
+                                        ) : (
+                                            typeGroups?.map((group) => (
+                                                <MenuItem key={group.code} value={group.code}>
+                                                    {group.label}
+                                                </MenuItem>
+                                            ))
+                                        )}
+                                    </Field>
+                                    {touched.groupCode && errors.groupCode && (
+                                        <FormHelperText>{errors.groupCode}</FormHelperText>
+                                    )}
+                                </FormControl>
+                            </Grid>
+                            <Grid item xs={12} md={6}>
+                                <FormControl 
+                                    fullWidth 
+                                    error={touched.privilegeTypeCode && Boolean(errors.privilegeTypeCode)}
+                                >
+                                    <InputLabel id="privilege-type-code-label">Privilege Type</InputLabel>
+                                    <Field
+                                        size={'small'}
+                                        as={Select}
+                                        labelId="privilege-type-code-label"
+                                        id="privilegeTypeCode"
+                                        name="privilegeTypeCode"
+                                        label="Privilege Type"
+                                        value={values.privilegeTypeCode}
+                                        onChange={handleChange}
+                                        onBlur={handleBlur}
+                                    >
+                                        {privilegeTypeCodes.map((option) => (
+                                            <MenuItem key={option.value} value={option.value}>
+                                                {option.label}
+                                            </MenuItem>
+                                        ))}
+                                    </Field>
+                                    {touched.privilegeTypeCode && errors.privilegeTypeCode && (
+                                        <FormHelperText>{errors.privilegeTypeCode}</FormHelperText>
+                                    )}
+                                </FormControl>
+                            </Grid>
+                            <Grid item xs={12}>
+                                <FormControl fullWidth>
+                                    <InputLabel id="active-label">Status</InputLabel>
+                                    <Field
+                                        size={'small'}
+                                        as={Select}
+                                        labelId="active-label"
+                                        id="active"
+                                        name="active"
+                                        label="Status"
+                                        value={values.active}
+                                        onChange={handleChange}
+                                        onBlur={handleBlur}
+                                    >
+                                        <MenuItem value={true}>Active</MenuItem>
+                                        <MenuItem value={false}>Inactive</MenuItem>
+                                    </Field>
+                                </FormControl>
+                            </Grid>
+                        </Grid>
                     </Form>
                 )}
             </Formik>
-        </Dialog>
+        </Modal>
     );
 };
 

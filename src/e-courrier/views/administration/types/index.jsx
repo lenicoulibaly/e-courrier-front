@@ -12,6 +12,7 @@ import {
     OutlinedInput,
     Select,
     MenuItem,
+    Tooltip,
     Typography
 } from '@mui/material';
 
@@ -25,6 +26,7 @@ import EditTypeModal from './EditTypeModal';
 // assets
 import { IconSearch } from '@tabler/icons-react';
 import AddIcon from '@mui/icons-material/Add';
+import { useTheme } from '@mui/material/styles';
 
 // ==============================|| TYPES MANAGEMENT ||============================== //
 
@@ -75,12 +77,14 @@ const TypesManagement = () => {
         setSelectedType(null);
     };
 
+    const theme = useTheme();
+
     return (
         <MainCard title="Types Management">
             <Grid container spacing={gridSpacing}>
                 <Grid item xs={12}>
                     <Grid container spacing={2} alignItems="center">
-                        <Grid item xs={12} sm={6} md={4} lg={3}>
+                        <Grid item xs={12} sm={5} md={4} lg={3}>
                             <FormControl fullWidth>
                                 <InputLabel htmlFor="search-types">Search</InputLabel>
                                 <OutlinedInput size={'small'}
@@ -97,7 +101,7 @@ const TypesManagement = () => {
                                 />
                             </FormControl>
                         </Grid>
-                        <Grid item xs={12} sm={6} md={4} lg={3}>
+                        <Grid item xs={12} sm={5} md={4} lg={3}>
                             <FormControl fullWidth>
                                 <InputLabel id="privilege-type-label">Privilege Type</InputLabel>
                                 <Select size={'small'}
@@ -115,14 +119,16 @@ const TypesManagement = () => {
                                 </Select>
                             </FormControl>
                         </Grid>
-                        <Grid item xs={12} sm={6} md={4} lg={3} sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-                            <Button
-                                variant="contained"
-                                startIcon={<AddIcon />}
-                                onClick={handleAddType}
-                                sx={{ marginLeft: 'auto' }}
-                            >
-                            </Button>
+                        <Grid item xs={12} sm={2} md={4} lg={6} sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
+                            <Tooltip title="Ajout d'un nouveau type" placement="top" arrow>
+                                <Button
+                                    variant="contained"
+                                    onClick={handleAddType}
+                                    sx={{ minWidth: '40px', width: '40px', height: '40px', padding: 0, backgroundColor:theme.palette.secondary.main }}
+                                >
+                                    <AddIcon />
+                                </Button>
+                            </Tooltip>
                         </Grid>
                     </Grid>
                 </Grid>
