@@ -23,12 +23,13 @@ import { Formik } from 'formik';
 
 // project imports
 import AnimateButton from 'ui-component/extended/AnimateButton';
-import useAuth from 'hooks/useAuth';
+import useAuth from 'e-courrier/hooks/useAuth';
 import useScriptRef from 'hooks/useScriptRef';
 
 // assets
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import { red } from '@mui/material/colors';
 
 // ===============================|| JWT LOGIN ||=============================== //
 
@@ -38,7 +39,7 @@ const JWTLogin = ({ loginProp, ...others }) => {
     const { login } = useAuth();
     const scriptedRef = useScriptRef();
 
-    const [checked, setChecked] = React.useState(true);
+    const [loginErrorMsg, setLoginErrorMsg] = React.useState(null);
 
     const [showPassword, setShowPassword] = React.useState(false);
     const handleClickShowPassword = () => {
@@ -52,8 +53,8 @@ const JWTLogin = ({ loginProp, ...others }) => {
     return (
         <Formik
             initialValues={{
-                email: 'info@codedthemes.com',
-                password: '123456',
+                email: '',
+                password: '',
                 submit: null
             }}
             validationSchema={Yup.object().shape({
@@ -63,16 +64,16 @@ const JWTLogin = ({ loginProp, ...others }) => {
             onSubmit={async (values, { setErrors, setStatus, setSubmitting }) => {
                 try {
                     await login(values.email, values.password);
-
                     if (scriptedRef.current) {
                         setStatus({ success: true });
                         setSubmitting(false);
                     }
                 } catch (err) {
-                    console.error(err);
+                    setLoginErrorMsg(err.message);
                     if (scriptedRef.current) {
                         setStatus({ success: false });
                         setErrors({ submit: err.message });
+
                         setSubmitting(false);
                     }
                 }
@@ -132,17 +133,7 @@ const JWTLogin = ({ loginProp, ...others }) => {
 
                     <Grid container alignItems="center" justifyContent="space-between">
                         <Grid item>
-                            <FormControlLabel
-                                control={
-                                    <Checkbox
-                                        checked={checked}
-                                        onChange={(event) => setChecked(event.target.checked)}
-                                        name="checked"
-                                        color="primary"
-                                    />
-                                }
-                                label="Keep me logged in"
-                            />
+                            <small style={{ color: red[500] }}>{loginErrorMsg}</small>
                         </Grid>
                         <Grid item>
                             <Typography

@@ -248,6 +248,11 @@ export const typeGroupApi = {
         const response = await apiClient.get('/types/groups/search', { params });
         return response.data;
     },
+
+    getAllTypeGroups: async (params = {}) => {
+        const response = await apiClient.get('/types/groups/list', { params });
+        return response.data;
+    },
 };
 
 // API Mail (endpoints publics)

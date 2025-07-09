@@ -13,7 +13,7 @@ import AuthCardWrapper from '../AuthCardWrapper';
 import AuthLogin from '../auth-forms/AuthLogin';
 import Logo from 'ui-component/Logo';
 import AuthFooter from 'ui-component/cards/AuthFooter';
-import useAuth from 'hooks/useAuth';
+import useAuth from 'e-courrier/hooks/useAuth';
 
 // assets
 
@@ -46,14 +46,14 @@ const Login = () => {
                                             <Grid item>
                                                 <Stack alignItems="center" justifyContent="center" spacing={1}>
                                                     <Typography color="secondary.main" gutterBottom variant={downMD ? 'h3' : 'h2'}>
-                                                        Hi, Welcome Back
+                                                        Bien venu sur la plateforme e-courrier
                                                     </Typography>
                                                     <Typography
                                                         variant="caption"
                                                         fontSize="16px"
                                                         textAlign={{ xs: 'center', md: 'inherit' }}
                                                     >
-                                                        Enter your credentials to continue
+                                                        Veuillez saisir vos paramètres de connexion
                                                     </Typography>
                                                 </Stack>
                                             </Grid>
@@ -64,18 +64,6 @@ const Login = () => {
                                     </Grid>
                                     <Grid item xs={12}>
                                         <Divider />
-                                    </Grid>
-                                    <Grid item xs={12}>
-                                        <Grid item container direction="column" alignItems="center" xs={12}>
-                                            <Typography
-                                                component={Link}
-                                                to={isLoggedIn ? '/pages/register/register3' : '/register'}
-                                                variant="subtitle1"
-                                                sx={{ textDecoration: 'none' }}
-                                            >
-                                                Don&apos;t have an account?
-                                            </Typography>
-                                        </Grid>
                                     </Grid>
                                 </Grid>
                             </AuthCardWrapper>

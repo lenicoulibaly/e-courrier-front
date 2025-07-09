@@ -8,6 +8,9 @@ import AuthGuard from 'utils/route-guard/AuthGuard';
 
 import { loader as productsLoader, productLoader } from 'api/products';
 
+// e-courrier administration routing
+const TypesManagement = Loadable(lazy(() => import('e-courrier/views/administration/types')));
+
 // dashboard routing
 const DashboardDefault = Loadable(lazy(() => import('views/dashboard/Default')));
 const DashboardAnalytics = Loadable(lazy(() => import('views/dashboard/Analytics')));
@@ -685,6 +688,12 @@ const MainRoutes = {
         {
             path: '/dashboard/analytics',
             element: <DashboardAnalytics />
+        },
+
+        // e-courrier administration routes
+        {
+            path: '/administration/types',
+            element: <TypesManagement />
         }
     ]
 };

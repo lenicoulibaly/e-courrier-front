@@ -14,7 +14,7 @@ const initialState = {
 // Actions asynchrones
 export const login = createAsyncThunk('auth/login', async ({ username, password }, { rejectWithValue }) => {
     try {
-        const response = await apiClient.post('/auth/login', {
+        const response = await apiClient.post('/users/open/login', {
             username,
             password
         });
@@ -33,7 +33,7 @@ export const login = createAsyncThunk('auth/login', async ({ username, password 
 
 export const logout = createAsyncThunk('auth/logout', async () => {
     try {
-        await apiClient.post('/auth/logout');
+        await apiClient.post('/users/open/logout');
     } catch (error) {
         // Même en cas d'erreur, on déconnecte localement
         console.warn('Erreur lors de la déconnexion:', error);
@@ -47,8 +47,17 @@ export const logout = createAsyncThunk('auth/logout', async () => {
 export const refreshToken = createAsyncThunk('auth/refreshToken', async (_, { getState, rejectWithValue }) => {
     try {
         const { auth } = getState();
-        const response = await apiClient.post('/auth/refresh', {
-            refreshToken: auth.refreshToken
+
+        // Vérifier si l'utilisateur est connecté
+        if (!auth.user || !auth.user.id) {
+            return rejectWithValue('Utilisateur non connecté');
+        }
+
+        // Utiliser le nouvel endpoint avec l'ID de l'utilisateur et placer le refreshToken dans l'entête
+        const response = await apiClient.post(`/users/refresh-token/${auth.user.id}`, {}, {
+            headers: {
+                'RefreshToken': auth.refreshToken
+            }
         });
 
         const { token, refreshToken: newRefreshToken } = response.data;

@@ -1,7 +1,7 @@
 
 import axios from 'axios';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8090/e-courrier';
+const API_BASE_URL = 'http://localhost:8090/e-courrier';
 
 // Instance axios centralisée
 const apiClient = axios.create({
