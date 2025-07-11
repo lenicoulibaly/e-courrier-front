@@ -1,10 +1,12 @@
 import apiClient from './apiClient';
+import qs from 'qs'; // tout en haut
 
 // API Utilisateurs
 export const userApi = {
     // Recherche utilisateurs
     searchUsers: async (params = {}) => {
-        const response = await apiClient.get('/users/search', { params });
+        const queryString = qs.stringify(params, { arrayFormat: 'repeat' });
+        const response = await apiClient.get(`/users/search?${queryString}`);
         return response.data;
     },
 
@@ -77,15 +79,18 @@ export const privilegeApi = {
 
     // Recherche privilèges
     searchPrivileges: async (params = {}) => {
-        const response = await apiClient.get('/authorities/privileges/search', { params });
+        const queryString = qs.stringify(params, { arrayFormat: 'repeat' });
+        const response = await apiClient.get(`/authorities/privileges/search?${queryString}`);
         return response.data;
     },
     searchPrivilegesByProfile: async (profileCode, params = {}) => {
-        const response = await apiClient.get(`/authorities/privileges/search/by-profile/${profileCode}`, { params });
+        const queryString = qs.stringify(params, { arrayFormat: 'repeat' });
+        const response = await apiClient.get(`/authorities/privileges/search/by-profile/${profileCode}?${queryString}`);
         return response.data;
     },
     searchPrivilegesByRole: async (roleCode, params = {}) => {
-        const response = await apiClient.get(`/authorities/privileges/search/by-role/${roleCode}`, { params });
+        const queryString = qs.stringify(params, { arrayFormat: 'repeat' });
+        const response = await apiClient.get(`/authorities/privileges/search/by-role/${roleCode}?${queryString}`);
         return response.data;
     },
 };
@@ -104,11 +109,13 @@ export const roleApi = {
 
     // Recherche rôles
     searchRoles: async (params = {}) => {
-        const response = await apiClient.get('/authorities/roles/search', { params });
+        const queryString = qs.stringify(params, { arrayFormat: 'repeat' });
+        const response = await apiClient.get(`/authorities/roles/search?${queryString}`);
         return response.data;
     },
     searchRolesByProfile: async (profileCode, params = {}) => {
-        const response = await apiClient.get(`/authorities/roles/search/by-profile/${profileCode}`, { params });
+        const queryString = qs.stringify(params, { arrayFormat: 'repeat' });
+        const response = await apiClient.get(`/authorities/roles/search/by-profile/${profileCode}?${queryString}`);
         return response.data;
     },
 };
@@ -127,11 +134,13 @@ export const profileApi = {
 
     // Recherche profils
     searchProfiles: async (params = {}) => {
-        const response = await apiClient.get('/authorities/profiles/search', { params });
+        const queryString = qs.stringify(params, { arrayFormat: 'repeat' });
+        const response = await apiClient.get(`/authorities/profiles/search?${queryString}`);
         return response.data;
     },
     searchProfilesByUser: async (userId, params = {}) => {
-        const response = await apiClient.get(`/authorities/profiles/search/by-user/${userId}`, { params });
+        const queryString = qs.stringify(params, { arrayFormat: 'repeat' });
+        const response = await apiClient.get(`/authorities/profiles/search/by-user/${userId}?${queryString}`);
         return response.data;
     },
 
@@ -165,7 +174,8 @@ export const structureApi = {
 
     // Recherche structures
     searchStructures: async (params = {}) => {
-        const response = await apiClient.get('/structures/search', { params });
+        const queryString = qs.stringify(params, { arrayFormat: 'repeat' });
+        const response = await apiClient.get(`/structures/search?${queryString}`);
         return response.data;
     },
     getRootStructures: async () => {
@@ -173,7 +183,8 @@ export const structureApi = {
         return response.data;
     },
     getPossibleParents: async (params = {}) => {
-        const response = await apiClient.get('/structures/possible-parents', { params });
+        const queryString = qs.stringify(params, { arrayFormat: 'repeat' });
+        const response = await apiClient.get(`/structures/possible-parents?${queryString}`);
         return response.data;
     },
 
@@ -208,7 +219,9 @@ export const typeApi = {
 
     // Recherche types
     searchTypes: async (params = {}) => {
-        const response = await apiClient.get('/types/search', { params });
+        console.log(params);
+        const queryString = qs.stringify(params, { arrayFormat: 'repeat' });
+        const response = await apiClient.get(`/types/search?${queryString}`);
         return response.data;
     },
     getTypesByGroup: async (groupCode) => {
@@ -216,11 +229,13 @@ export const typeApi = {
         return response.data;
     },
     getDirectSousTypes: async (params = {}) => {
-        const response = await apiClient.get('/types/direct-sous-types', { params });
+        const queryString = qs.stringify(params, { arrayFormat: 'repeat' });
+        const response = await apiClient.get(`/types/direct-sous-types?${queryString}`);
         return response.data;
     },
     getPossibleSousTypes: async (params = {}) => {
-        const response = await apiClient.get('/types/possible-sous-types', { params });
+        const queryString = qs.stringify(params, { arrayFormat: 'repeat' });
+        const response = await apiClient.get(`/types/possible-sous-types?${queryString}`);
         return response.data;
     },
 
@@ -245,12 +260,14 @@ export const typeGroupApi = {
 
     // Recherche groupes
     searchTypeGroups: async (params = {}) => {
-        const response = await apiClient.get('/types/groups/search', { params });
+        const queryString = qs.stringify(params, { arrayFormat: 'repeat' });
+        const response = await apiClient.get(`/types/groups/search?${queryString}`);
         return response.data;
     },
 
     getAllTypeGroups: async (params = {}) => {
-        const response = await apiClient.get('/types/groups/list', { params });
+        const queryString = qs.stringify(params, { arrayFormat: 'repeat' });
+        const response = await apiClient.get(`/types/groups/list?${queryString}`);
         return response.data;
     },
 };

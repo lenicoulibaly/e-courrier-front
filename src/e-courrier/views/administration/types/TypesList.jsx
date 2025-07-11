@@ -21,7 +21,7 @@ import {
 
 // project imports
 import { ThemeMode } from 'config';
-import { useTypes } from '../../../hooks/query/useTypes';
+import { useSearchTypes } from '../../../hooks/query/useSearchTypes';
 import Pagination from '../../../components/commons/Pagination';
 
 // assets
@@ -29,22 +29,22 @@ import EditIcon from '@mui/icons-material/Edit';
 
 // ==============================|| TYPES LIST ||============================== //
 
-const TypesList = ({ searchTerm, privilegeTypeCode, onEditType }) => {
+const TypesList = ({ searchTerm, groupCodes, onEditType }) => {
     const theme = useTheme();
     const [filteredTypes, setFilteredTypes] = useState([]);
     const [page, setPage] = useState(0);
     const [pageSize, setPageSize] = useState(3);
 
     // Fetch types using the useTypes hook with pagination
-    const { data: typesPage, isLoading, isError, error } = useTypes({ page: page, size: pageSize, key: searchTerm });
+    const { data: typesPage, isLoading, isError, error } = useSearchTypes({ page: page, size: pageSize, key: searchTerm, groupCodes: groupCodes});
     const types = typesPage?.content;
-    // Filter types based on search term and privilegeTypeCode
+    // Filter types based on search term and groups
     useEffect(() => {
         if (types) {
             let filtered = [...types];
             setFilteredTypes(filtered);
         }
-    }, [types, searchTerm, privilegeTypeCode]);
+    }, [types, searchTerm, groupCodes]);
 
     // Handle edit button click
     const handleEdit = (type) => {
@@ -148,7 +148,7 @@ const TypesList = ({ searchTerm, privilegeTypeCode, onEditType }) => {
 
 TypesList.propTypes = {
     searchTerm: PropTypes.string,
-    privilegeTypeCode: PropTypes.string,
+    groupCodes: PropTypes.array,
     onEditType: PropTypes.func
 };
 

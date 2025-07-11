@@ -18,14 +18,15 @@ const TYPE_GROUPS_KEYS = {
 };
 
 // Hooks for fetching types
-export const useTypes = (params = {}) => {
+export const useSearchTypes = (params = {}) => {
+    console.log(params);
     return useQuery({
         queryKey: TYPES_KEYS.list(params),
         queryFn: () => typeApi.searchTypes(params),
     });
 };
 
-export const useTypesByGroup = (groupCode) => {
+export const useTypesByGroupCode = (groupCode) => {
     return useQuery({
         queryKey: TYPES_KEYS.byGroup(groupCode),
         queryFn: () => typeApi.getTypesByGroup(groupCode),

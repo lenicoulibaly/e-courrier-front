@@ -13,10 +13,11 @@ import {
     Select,
     TextField,
 } from '@mui/material';
+import Autocomplete from '@mui/material/Autocomplete';
 
 // project imports
 import { gridSpacing } from 'store/constant';
-import { useUpdateType, useGetAllTypeGroups } from '../../../hooks/query/useTypes';
+import { useUpdateType, useGetAllTypeGroups } from '../../../hooks/query/useSearchTypes';
 import Modal from '../../../components/commons/Modal';
 
 // validation schema
@@ -155,33 +156,31 @@ const EditTypeModal = ({ open, handleClose, type }) => {
                                     fullWidth 
                                     error={touched.groupCode && Boolean(errors.groupCode)}
                                 >
-                                    <InputLabel id="group-code-label">Group</InputLabel>
-                                    <Field
-                                        size={'small'}
-                                        as={Select}
-                                        labelId="group-code-label"
+                                    <Autocomplete
                                         id="groupCode"
-                                        name="groupCode"
-                                        label="Group"
-                                        value={values.groupCode}
-                                        onChange={handleChange}
+                                        size="small"
+                                        options={isLoadingGroups ? [] : typeGroups}
+                                        getOptionLabel={(option) => option.label || ''}
+                                        value={typeGroups.find(group => group.code === values.groupCode) || null}
+                                        onChange={(event, newValue) => {
+                                            handleChange({
+                                                target: {
+                                                    name: 'groupCode',
+                                                    value: newValue ? newValue.code : ''
+                                                }
+                                            });
+                                        }}
                                         onBlur={handleBlur}
-                                    >
-                                        {isLoadingGroups ? (
-                                            <MenuItem value="">
-                                                <em>Loading...</em>
-                                            </MenuItem>
-                                        ) : (
-                                            typeGroups?.map((group) => (
-                                                <MenuItem key={group.code} value={group.code}>
-                                                    {group.label}
-                                                </MenuItem>
-                                            ))
+                                        loading={isLoadingGroups}
+                                        renderInput={(params) => (
+                                            <TextField
+                                                {...params}
+                                                label="Group"
+                                                error={touched.groupCode && Boolean(errors.groupCode)}
+                                                helperText={touched.groupCode && errors.groupCode}
+                                            />
                                         )}
-                                    </Field>
-                                    {touched.groupCode && errors.groupCode && (
-                                        <FormHelperText>{errors.groupCode}</FormHelperText>
-                                    )}
+                                    />
                                 </FormControl>
                             </Grid>
                             <Grid item xs={12} md={6}>
@@ -189,46 +188,63 @@ const EditTypeModal = ({ open, handleClose, type }) => {
                                     fullWidth 
                                     error={touched.privilegeTypeCode && Boolean(errors.privilegeTypeCode)}
                                 >
-                                    <InputLabel id="privilege-type-code-label">Privilege Type</InputLabel>
-                                    <Field
-                                        size={'small'}
-                                        as={Select}
-                                        labelId="privilege-type-code-label"
+                                    <Autocomplete
                                         id="privilegeTypeCode"
-                                        name="privilegeTypeCode"
-                                        label="Privilege Type"
-                                        value={values.privilegeTypeCode}
-                                        onChange={handleChange}
+                                        size="small"
+                                        options={privilegeTypeCodes}
+                                        getOptionLabel={(option) => option.label || ''}
+                                        value={privilegeTypeCodes.find(option => option.value === values.privilegeTypeCode) || null}
+                                        onChange={(event, newValue) => {
+                                            handleChange({
+                                                target: {
+                                                    name: 'privilegeTypeCode',
+                                                    value: newValue ? newValue.value : ''
+                                                }
+                                            });
+                                        }}
                                         onBlur={handleBlur}
-                                    >
-                                        {privilegeTypeCodes.map((option) => (
-                                            <MenuItem key={option.value} value={option.value}>
-                                                {option.label}
-                                            </MenuItem>
-                                        ))}
-                                    </Field>
-                                    {touched.privilegeTypeCode && errors.privilegeTypeCode && (
-                                        <FormHelperText>{errors.privilegeTypeCode}</FormHelperText>
-                                    )}
+                                        renderInput={(params) => (
+                                            <TextField
+                                                {...params}
+                                                label="Privilege Type"
+                                                error={touched.privilegeTypeCode && Boolean(errors.privilegeTypeCode)}
+                                                helperText={touched.privilegeTypeCode && errors.privilegeTypeCode}
+                                            />
+                                        )}
+                                    />
                                 </FormControl>
                             </Grid>
                             <Grid item xs={12}>
                                 <FormControl fullWidth>
-                                    <InputLabel id="active-label">Status</InputLabel>
-                                    <Field
-                                        size={'small'}
-                                        as={Select}
-                                        labelId="active-label"
+                                    <Autocomplete
                                         id="active"
-                                        name="active"
-                                        label="Status"
-                                        value={values.active}
-                                        onChange={handleChange}
+                                        size="small"
+                                        options={[
+                                            { value: true, label: 'Active' },
+                                            { value: false, label: 'Inactive' }
+                                        ]}
+                                        getOptionLabel={(option) => option.label || ''}
+                                        value={
+                                            values.active !== undefined 
+                                                ? { value: values.active, label: values.active ? 'Active' : 'Inactive' } 
+                                                : null
+                                        }
+                                        onChange={(event, newValue) => {
+                                            handleChange({
+                                                target: {
+                                                    name: 'active',
+                                                    value: newValue ? newValue.value : true
+                                                }
+                                            });
+                                        }}
                                         onBlur={handleBlur}
-                                    >
-                                        <MenuItem value={true}>Active</MenuItem>
-                                        <MenuItem value={false}>Inactive</MenuItem>
-                                    </Field>
+                                        renderInput={(params) => (
+                                            <TextField
+                                                {...params}
+                                                label="Status"
+                                            />
+                                        )}
+                                    />
                                 </FormControl>
                             </Grid>
                         </Grid>

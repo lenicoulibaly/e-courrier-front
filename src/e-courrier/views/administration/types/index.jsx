@@ -10,11 +10,12 @@ import {
     InputAdornment,
     InputLabel,
     OutlinedInput,
-    Select,
     MenuItem,
     Tooltip,
-    Typography
+    Typography,
+    TextField
 } from '@mui/material';
+import Autocomplete from '@mui/material/Autocomplete';
 
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
@@ -27,6 +28,7 @@ import EditTypeModal from './EditTypeModal';
 import { IconSearch } from '@tabler/icons-react';
 import AddIcon from '@mui/icons-material/Add';
 import { useTheme } from '@mui/material/styles';
+import { useGetAllTypeGroups, useTypesByGroupCode } from '../../../hooks/query';
 
 // ==============================|| TYPES MANAGEMENT ||============================== //
 
@@ -34,20 +36,14 @@ const TypesManagement = () => {
     const navigate = useNavigate();
     const [isLoading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
-    const [privilegeTypeCode, setPrivilegeTypeCode] = useState('');
+    const [selectedGroups, setSelectedGroups] = useState([]);
     const [openAddModal, setOpenAddModal] = useState(false);
     const [openEditModal, setOpenEditModal] = useState(false);
     const [selectedType, setSelectedType] = useState(null);
 
-    // Privilege type codes for dropdown
-    const privilegeTypeCodes = [
-        { value: '', label: 'All' },
-        { value: 'ADMIN', label: 'Admin' },
-        { value: 'USER', label: 'User' },
-        { value: 'GUEST', label: 'Guest' }
-    ];
+    const {data: groups} = useGetAllTypeGroups()
 
-    useEffect(() => {
+        useEffect(() => {
         setLoading(false);
     }, []);
 
@@ -55,9 +51,11 @@ const TypesManagement = () => {
         setSearchTerm(event.target.value);
     };
 
-    const handlePrivilegeTypeChange = (event) => {
-        setPrivilegeTypeCode(event.target.value);
+    const handleGroupsChange = (event, newValue) => {
+        // newValue will be an array of selected group objects
+        setSelectedGroups(newValue.map(group => group.groupCode));
     };
+
 
     const handleAddType = () => {
         setOpenAddModal(true);
@@ -84,7 +82,7 @@ const TypesManagement = () => {
             <Grid container spacing={gridSpacing}>
                 <Grid item xs={12}>
                     <Grid container spacing={2} alignItems="center">
-                        <Grid item xs={12} sm={5} md={4} lg={3}>
+                        <Grid item xs={12} sm={5} md={4}>
                             <FormControl fullWidth>
                                 <InputLabel htmlFor="search-types">Search</InputLabel>
                                 <OutlinedInput size={'small'}
@@ -101,25 +99,29 @@ const TypesManagement = () => {
                                 />
                             </FormControl>
                         </Grid>
-                        <Grid item xs={12} sm={5} md={4} lg={3}>
+                        <Grid item xs={12} sm={5} md={6}>
                             <FormControl fullWidth>
-                                <InputLabel id="privilege-type-label">Privilege Type</InputLabel>
-                                <Select size={'small'}
-                                    labelId="privilege-type-label"
-                                    id="privilege-type-select"
-                                    value={privilegeTypeCode}
-                                    label="Privilege Type"
-                                    onChange={handlePrivilegeTypeChange}
-                                >
-                                    {privilegeTypeCodes.map((option) => (
-                                        <MenuItem key={option.value} value={option.value}>
-                                            {option.label}
-                                        </MenuItem>
-                                    ))}
-                                </Select>
+                                <Autocomplete
+                                    multiple
+                                    size={'small'}
+                                    id="groups-select"
+                                    options={groups || []}
+                                    getOptionLabel={(option) => option.name}
+                                    isOptionEqualToValue={(option, value) => option.groupCode === value.groupCode}
+                                    value={(groups || []).filter(group => selectedGroups.includes(group.groupCode))}
+                                    onChange={handleGroupsChange}
+                                    filterSelectedOptions
+                                    renderInput={(params) => (
+                                        <TextField
+                                            {...params}
+                                            label="Groupes"
+                                            placeholder="Filtrer les groupes"
+                                        />
+                                    )}
+                                />
                             </FormControl>
                         </Grid>
-                        <Grid item xs={12} sm={2} md={4} lg={6} sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
+                        <Grid item xs={12} sm={2} md={2} sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
                             <Tooltip title="Ajout d'un nouveau type" placement="top" arrow>
                                 <Button
                                     variant="contained"
@@ -135,7 +137,7 @@ const TypesManagement = () => {
                 <Grid item xs={12}>
                     <TypesList 
                         searchTerm={searchTerm} 
-                        privilegeTypeCode={privilegeTypeCode} 
+                        groupCodes={selectedGroups}
                         onEditType={handleEditType} 
                     />
                 </Grid>
