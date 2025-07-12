@@ -23,7 +23,7 @@ const rootReducer = combineReducers({
     users: userSlice,
     authorities: authoritySlice,
     structures: structureSlice,
-    types: typeSlice,
+    types: typeSlice
 });
 
 // Reducer persisté

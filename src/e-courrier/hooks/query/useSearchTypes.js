@@ -19,7 +19,6 @@ const TYPE_GROUPS_KEYS = {
 
 // Hooks for fetching types
 export const useSearchTypes = (params = {}) => {
-    console.log(params);
     return useQuery({
         queryKey: TYPES_KEYS.list(params),
         queryFn: () => typeApi.searchTypes(params),

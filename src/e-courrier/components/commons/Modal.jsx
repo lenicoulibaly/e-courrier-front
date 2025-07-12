@@ -19,6 +19,7 @@ import PrintIcon from '@mui/icons-material/Print';
 import AddBoxIcon from '@mui/icons-material/AddBox';
 import {Edit} from "@mui/icons-material";
 import SaveIcon from '@mui/icons-material/Save';
+import CustomAlertDialog from './CustomAlertDialog';
 
 export const StyledDialog = styled(Dialog)(({ theme, bgcolor }) => ({
     '& .MuiDialog-paper': {
@@ -89,7 +90,7 @@ const Modal = ({ open, printVisible=false, newVisible=false,
                         </IconButton>
                     </Tooltip>}
                 </Box>
-                <AlertDialog actionVisible={actionVisible}
+                <CustomAlertDialog actionVisible={actionVisible}
                              actionDisabled={actionDisabled}
                              openLabel={actionLabel || 'Enregistrer'}
                              handleConfirmation={handleConfirmation}

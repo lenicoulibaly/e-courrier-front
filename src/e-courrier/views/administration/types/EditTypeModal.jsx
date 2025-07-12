@@ -19,23 +19,21 @@ import Autocomplete from '@mui/material/Autocomplete';
 import { gridSpacing } from 'store/constant';
 import { useUpdateType, useGetAllTypeGroups } from '../../../hooks/query/useSearchTypes';
 import Modal from '../../../components/commons/Modal';
+import FloatingAlert from '../../../components/commons/FloatingAlert';
+import SimpleBackdrop from '../../../components/commons/SimpleBackdrop';
 
 // validation schema
 const TypeSchema = Yup.object().shape({
-    id: Yup.string().required('ID is required'),
     code: Yup.string()
-        .required('Code is required')
-        .max(50, 'Code must be at most 50 characters'),
-    label: Yup.string()
-        .required('Label is required')
-        .max(100, 'Label must be at most 100 characters'),
+        .required('Le code est obligatoire')
+        .max(50, 'La taille du code ne peut excéder 50 caractères'),
+    name: Yup.string()
+        .required('Le nom est obligatoire')
+        .max(100, 'La taille du nom ne peut excéder 100 caractères'),
     description: Yup.string()
-        .max(255, 'Description must be at most 255 characters'),
+        .max(255, 'La description ne peut excéder 255 caractères'),
     groupCode: Yup.string()
-        .required('Group is required'),
-    privilegeTypeCode: Yup.string()
-        .required('Privilege Type is required'),
-    active: Yup.boolean()
+        .required('Le groupe est obligatoire')
 });
 
 // ==============================|| EDIT TYPE MODAL ||============================== //
@@ -45,21 +43,18 @@ const EditTypeModal = ({ open, handleClose, type }) => {
     const { data: typeGroups = [], isLoading: isLoadingGroups } = useGetAllTypeGroups();
 
     // Mutation for updating a type
-    const { mutate: updateType, isLoading: isUpdating } = useUpdateType();
+    const { mutate: updateType, isPending: isUpdating, isSuccess: isUpdateSuccess, isError: isUpdateError, error: updateError } = useUpdateType();
 
     // Privilege type codes for dropdown
-    const privilegeTypeCodes = [
-        { value: 'ADMIN', label: 'Admin' },
-        { value: 'USER', label: 'User' },
-        { value: 'GUEST', label: 'Guest' }
-    ];
+
 
     // Handle form submission
-    const handleSubmit = (values, { setSubmitting }) => {
+    const handleSubmit = (values, { setSubmitting }) =>
+    {
+        console.log(values);
         updateType(values, {
             onSuccess: () => {
                 setSubmitting(false);
-                handleClose();
             },
             onError: (error) => {
                 console.error('Error updating type:', error);
@@ -75,32 +70,26 @@ const EditTypeModal = ({ open, handleClose, type }) => {
         <Modal
             open={open}
             handleClose={handleClose}
-            title="Edit Type"
-            width="md"
-            actionLabel="Save"
+            title="Modification de type"
+            width="sm"
+            actionLabel="Enregistrer"
             actionDisabled={isUpdating}
             handleConfirmation={() => {
-                // The actual submission is handled by Formik
-                document.getElementById('edit-type-form').dispatchEvent(
-                    new Event('submit', { cancelable: true, bubbles: true })
-                );
+                document.getElementById('edit-type-form').dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
             }}
         >
             <Formik
                 initialValues={{
-                    id: type.id || '',
                     code: type.code || '',
-                    label: type.label || '',
+                    name: type.name || '',
                     description: type.description || '',
-                    groupCode: type.groupCode || '',
-                    privilegeTypeCode: type.privilegeTypeCode || '',
-                    active: type.active !== undefined ? type.active : true
+                    groupCode: type.groupCode || ''
                 }}
                 validationSchema={TypeSchema}
                 onSubmit={handleSubmit}
                 enableReinitialize
             >
-                {({ errors, touched, handleChange, handleBlur, values, isSubmitting }) => (
+                {({ errors, setFieldValue, touched, handleChange, handleBlur, values, isSubmitting }) => (
                     <Form id="edit-type-form">
                         <Grid container spacing={gridSpacing}>
                             <Grid item xs={12} md={6}>
@@ -124,15 +113,42 @@ const EditTypeModal = ({ open, handleClose, type }) => {
                                     size={'small'}
                                     as={TextField}
                                     fullWidth
-                                    id="label"
-                                    name="label"
-                                    label="Label"
-                                    value={values.label}
+                                    id="name"
+                                    name="name"
+                                    label="name"
+                                    value={values.name}
                                     onChange={handleChange}
                                     onBlur={handleBlur}
-                                    error={touched.label && Boolean(errors.label)}
-                                    helperText={touched.label && errors.label}
+                                    error={touched.name && Boolean(errors.name)}
+                                    helperText={touched.name && errors.name}
                                 />
+                            </Grid>
+                            <Grid item xs={12} md={12}>
+                                <FormControl
+                                    fullWidth
+                                    error={touched.groupCode && Boolean(errors.groupCode)}
+                                >
+                                    <Autocomplete
+                                        id="groupCode"
+                                        size="small"
+                                        options={isLoadingGroups ? [] : typeGroups}
+                                        getOptionLabel={(option) => option.name || ''}
+                                        value={typeGroups.find(group => group.groupCode === values.groupCode) || null}
+                                        onChange={(event, newValue) => {
+                                            setFieldValue('groupCode', newValue ? newValue.groupCode : '');
+                                        }}
+                                        onBlur={handleBlur}
+                                        loading={isLoadingGroups}
+                                        renderInput={(params) => (
+                                            <TextField
+                                                {...params}
+                                                label="Group"
+                                                error={touched.groupCode && Boolean(errors.groupCode)}
+                                                helperText={touched.groupCode && errors.groupCode}
+                                            />
+                                        )}
+                                    />
+                                </FormControl>
                             </Grid>
                             <Grid item xs={12}>
                                 <Field
@@ -151,106 +167,13 @@ const EditTypeModal = ({ open, handleClose, type }) => {
                                     helperText={touched.description && errors.description}
                                 />
                             </Grid>
-                            <Grid item xs={12} md={6}>
-                                <FormControl 
-                                    fullWidth 
-                                    error={touched.groupCode && Boolean(errors.groupCode)}
-                                >
-                                    <Autocomplete
-                                        id="groupCode"
-                                        size="small"
-                                        options={isLoadingGroups ? [] : typeGroups}
-                                        getOptionLabel={(option) => option.label || ''}
-                                        value={typeGroups.find(group => group.code === values.groupCode) || null}
-                                        onChange={(event, newValue) => {
-                                            handleChange({
-                                                target: {
-                                                    name: 'groupCode',
-                                                    value: newValue ? newValue.code : ''
-                                                }
-                                            });
-                                        }}
-                                        onBlur={handleBlur}
-                                        loading={isLoadingGroups}
-                                        renderInput={(params) => (
-                                            <TextField
-                                                {...params}
-                                                label="Group"
-                                                error={touched.groupCode && Boolean(errors.groupCode)}
-                                                helperText={touched.groupCode && errors.groupCode}
-                                            />
-                                        )}
-                                    />
-                                </FormControl>
-                            </Grid>
-                            <Grid item xs={12} md={6}>
-                                <FormControl 
-                                    fullWidth 
-                                    error={touched.privilegeTypeCode && Boolean(errors.privilegeTypeCode)}
-                                >
-                                    <Autocomplete
-                                        id="privilegeTypeCode"
-                                        size="small"
-                                        options={privilegeTypeCodes}
-                                        getOptionLabel={(option) => option.label || ''}
-                                        value={privilegeTypeCodes.find(option => option.value === values.privilegeTypeCode) || null}
-                                        onChange={(event, newValue) => {
-                                            handleChange({
-                                                target: {
-                                                    name: 'privilegeTypeCode',
-                                                    value: newValue ? newValue.value : ''
-                                                }
-                                            });
-                                        }}
-                                        onBlur={handleBlur}
-                                        renderInput={(params) => (
-                                            <TextField
-                                                {...params}
-                                                label="Privilege Type"
-                                                error={touched.privilegeTypeCode && Boolean(errors.privilegeTypeCode)}
-                                                helperText={touched.privilegeTypeCode && errors.privilegeTypeCode}
-                                            />
-                                        )}
-                                    />
-                                </FormControl>
-                            </Grid>
-                            <Grid item xs={12}>
-                                <FormControl fullWidth>
-                                    <Autocomplete
-                                        id="active"
-                                        size="small"
-                                        options={[
-                                            { value: true, label: 'Active' },
-                                            { value: false, label: 'Inactive' }
-                                        ]}
-                                        getOptionLabel={(option) => option.label || ''}
-                                        value={
-                                            values.active !== undefined 
-                                                ? { value: values.active, label: values.active ? 'Active' : 'Inactive' } 
-                                                : null
-                                        }
-                                        onChange={(event, newValue) => {
-                                            handleChange({
-                                                target: {
-                                                    name: 'active',
-                                                    value: newValue ? newValue.value : true
-                                                }
-                                            });
-                                        }}
-                                        onBlur={handleBlur}
-                                        renderInput={(params) => (
-                                            <TextField
-                                                {...params}
-                                                label="Status"
-                                            />
-                                        )}
-                                    />
-                                </FormControl>
-                            </Grid>
+
                         </Grid>
                     </Form>
                 )}
             </Formik>
+            <FloatingAlert open={isUpdateError || isUpdateSuccess} feedBackMessages={isUpdateError ? updateError?.response.data : isUpdateSuccess ? 'Type modifié avec succès' : ''} severity={isUpdateError ? 'error' : isUpdateSuccess ? 'success' : 'info'}/>
+            <SimpleBackdrop open={isUpdating}/>
         </Modal>
     );
 };

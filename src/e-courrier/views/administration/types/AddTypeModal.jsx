@@ -20,22 +20,21 @@ import Autocomplete from '@mui/material/Autocomplete';
 import { gridSpacing } from 'store/constant';
 import { useCreateType, useGetAllTypeGroups } from '../../../hooks/query/useSearchTypes';
 import Modal from '../../../components/commons/Modal';
+import FloatingAlert from '../../../components/commons/FloatingAlert';
+import SimpleBackdrop from '../../../components/commons/SimpleBackdrop';
 
 // validation schema
 const TypeSchema = Yup.object().shape({
     code: Yup.string()
-        .required('Code is required')
-        .max(50, 'Code must be at most 50 characters'),
-    label: Yup.string()
-        .required('Label is required')
-        .max(100, 'Label must be at most 100 characters'),
+        .required('Le code est requis')
+        .max(50, 'La taille du code ne peut excéder 50 caractères'),
+    name: Yup.string()
+        .required('Le nom est obligatoire')
+        .max(100, 'La taille du nom ne peut excéder 100 caractères'),
     description: Yup.string()
-        .max(255, 'Description must be at most 255 characters'),
+        .max(255, 'La description ne peut excéder 255 caractères'),
     groupCode: Yup.string()
-        .required('Group is required'),
-    privilegeTypeCode: Yup.string()
-        .required('Privilege Type is required'),
-    active: Yup.boolean()
+        .required('Le groupe est obligatoire')
 });
 
 // ==============================|| ADD TYPE MODAL ||============================== //
@@ -45,65 +44,50 @@ const AddTypeModal = ({ open, handleClose }) => {
     const { data: typeGroups = [], isLoading: isLoadingGroups } = useGetAllTypeGroups();
 
     // Mutation for creating a new type
-    const { mutate: createType, isLoading: isCreating } = useCreateType();
+    const { mutate: createType, isPending: isCreating, isSuccess: isCreateSuccess, isError: isCreateError, error : createError } = useCreateType();
 
-    // Privilege type codes for dropdown
-    const privilegeTypeCodes = [
-        { value: 'ADMIN', label: 'Admin' },
-        { value: 'USER', label: 'User' },
-        { value: 'GUEST', label: 'Guest' }
-    ];
 
     // Initial form values
     const initialValues = {
         code: '',
-        label: '',
+        name: '',
         description: '',
-        groupCode: '',
-        privilegeTypeCode: '',
-        active: true
+        groupCode: ''
     };
 
     // Handle form submission
-    const handleSubmit = (values, { setSubmitting, resetForm }) => {
+    const handleSubmit = (values, { setSubmitting, resetForm }) =>
+    {
         createType(values, {
             onSuccess: () => {
                 setSubmitting(false);
                 resetForm();
-                handleClose();
             },
             onError: (error) => {
-                console.error('Error creating type:', error);
+                console.error('Error creating type:', error.response.data);
                 setSubmitting(false);
             }
         });
     };
-
     return (
         <Modal
             open={open}
             handleClose={handleClose}
-            title="Add New Type"
-            width="md"
-            actionLabel="Save"
+            title="Création d'un nouveau type"
+            width="sm"
+            actionLabel="Enregistrer"
             actionDisabled={isCreating}
             handleConfirmation={() => {
-                // The actual submission is handled by Formik
-                document.getElementById('add-type-form').dispatchEvent(
-                    new Event('submit', { cancelable: true, bubbles: true })
-                );
+                document.getElementById('add-type-form').dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
             }}
         >
-            <Formik
-                initialValues={initialValues}
-                validationSchema={TypeSchema}
-                onSubmit={handleSubmit}
-            >
-                {({ errors, touched, handleChange, handleBlur, values, isSubmitting }) => (
+            <Formik initialValues={initialValues} validationSchema={TypeSchema} onSubmit={handleSubmit}>
+                {({ errors, setFieldValue, touched, handleChange, handleBlur, values, isSubmitting }) => (
                     <Form id="add-type-form">
                         <Grid container spacing={gridSpacing}>
                             <Grid item xs={12} md={6}>
-                                <Field size={'small'}
+                                <Field
+                                    size={'small'}
                                     as={TextField}
                                     fullWidth
                                     id="code"
@@ -117,53 +101,32 @@ const AddTypeModal = ({ open, handleClose }) => {
                                 />
                             </Grid>
                             <Grid item xs={12} md={6}>
-                                <Field size={'small'}
+                                <Field
+                                    size={'small'}
                                     as={TextField}
                                     fullWidth
-                                    id="label"
-                                    name="label"
-                                    label="Label"
-                                    value={values.label}
+                                    id="name"
+                                    name="name"
+                                    label="Nom du type"
+                                    value={values.name}
                                     onChange={handleChange}
                                     onBlur={handleBlur}
-                                    error={touched.label && Boolean(errors.label)}
-                                    helperText={touched.label && errors.label}
+                                    error={touched.name && Boolean(errors.name)}
+                                    helperText={touched.name && errors.name}
                                 />
                             </Grid>
                             <Grid item xs={12}>
-                                <Field size={'small'}
-                                    as={TextField}
-                                    fullWidth
-                                    id="description"
-                                    name="description"
-                                    label="Description"
-                                    multiline
-                                    rows={3}
-                                    value={values.description}
-                                    onChange={handleChange}
-                                    onBlur={handleBlur}
-                                    error={touched.description && Boolean(errors.description)}
-                                    helperText={touched.description && errors.description}
-                                />
-                            </Grid>
-                            <Grid item xs={12} md={6}>
-                                <FormControl 
-                                    fullWidth 
-                                    error={touched.groupCode && Boolean(errors.groupCode)}
-                                >
+                                <FormControl fullWidth error={touched.groupCode && Boolean(errors.groupCode)}>
                                     <Autocomplete
                                         id="groupCode"
                                         size="small"
                                         options={isLoadingGroups ? [] : typeGroups}
-                                        getOptionLabel={(option) => option.label || ''}
-                                        value={typeGroups.find(group => group.code === values.groupCode) || null}
+                                        getOptionLabel={(option) => option.name || ''}
+                                        value={
+                                            typeGroups.find((group) => group.groupCode === values.groupCode) || null
+                                        }
                                         onChange={(event, newValue) => {
-                                            handleChange({
-                                                target: {
-                                                    name: 'groupCode',
-                                                    value: newValue ? newValue.code : ''
-                                                }
-                                            });
+                                            setFieldValue('groupCode', newValue ? newValue.groupCode : '');
                                         }}
                                         onBlur={handleBlur}
                                         loading={isLoadingGroups}
@@ -178,74 +141,29 @@ const AddTypeModal = ({ open, handleClose }) => {
                                     />
                                 </FormControl>
                             </Grid>
-                            <Grid item xs={12} md={6}>
-                                <FormControl 
-                                    fullWidth 
-                                    error={touched.privilegeTypeCode && Boolean(errors.privilegeTypeCode)}
-                                >
-                                    <Autocomplete
-                                        id="privilegeTypeCode"
-                                        size="small"
-                                        options={privilegeTypeCodes}
-                                        getOptionLabel={(option) => option.label || ''}
-                                        value={privilegeTypeCodes.find(option => option.value === values.privilegeTypeCode) || null}
-                                        onChange={(event, newValue) => {
-                                            handleChange({
-                                                target: {
-                                                    name: 'privilegeTypeCode',
-                                                    value: newValue ? newValue.value : ''
-                                                }
-                                            });
-                                        }}
-                                        onBlur={handleBlur}
-                                        renderInput={(params) => (
-                                            <TextField
-                                                {...params}
-                                                label="Privilege Type"
-                                                error={touched.privilegeTypeCode && Boolean(errors.privilegeTypeCode)}
-                                                helperText={touched.privilegeTypeCode && errors.privilegeTypeCode}
-                                            />
-                                        )}
-                                    />
-                                </FormControl>
-                            </Grid>
                             <Grid item xs={12}>
-                                <FormControl fullWidth>
-                                    <Autocomplete
-                                        id="active"
-                                        size="small"
-                                        options={[
-                                            { value: true, label: 'Active' },
-                                            { value: false, label: 'Inactive' }
-                                        ]}
-                                        getOptionLabel={(option) => option.label || ''}
-                                        value={
-                                            values.active !== undefined 
-                                                ? { value: values.active, label: values.active ? 'Active' : 'Inactive' } 
-                                                : null
-                                        }
-                                        onChange={(event, newValue) => {
-                                            handleChange({
-                                                target: {
-                                                    name: 'active',
-                                                    value: newValue ? newValue.value : true
-                                                }
-                                            });
-                                        }}
-                                        onBlur={handleBlur}
-                                        renderInput={(params) => (
-                                            <TextField
-                                                {...params}
-                                                label="Status"
-                                            />
-                                        )}
-                                    />
-                                </FormControl>
+                                <Field
+                                    size={'small'}
+                                    as={TextField}
+                                    fullWidth
+                                    id="description"
+                                    name="description"
+                                    label="Description"
+                                    multiline
+                                    rows={3}
+                                    value={values.description}
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    error={touched.description && Boolean(errors.description)}
+                                    helperText={touched.description && errors.description}
+                                />
                             </Grid>
                         </Grid>
                     </Form>
                 )}
             </Formik>
+            <FloatingAlert open={isCreateError || isCreateSuccess} feedBackMessages={isCreateError ? createError?.response.data : isCreateSuccess ? 'Type créé avec succès' : ''} severity={isCreateError ? 'error' : isCreateSuccess ? 'success' : 'info'}/>
+            <SimpleBackdrop open={isCreating}/>
         </Modal>
     );
 };

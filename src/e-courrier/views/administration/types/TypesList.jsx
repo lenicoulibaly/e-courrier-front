@@ -48,7 +48,8 @@ const TypesList = ({ searchTerm, groupCodes, onEditType }) => {
 
     // Handle edit button click
     const handleEdit = (type) => {
-        if (onEditType) {
+        if (onEditType)
+        {
             onEditType(type);
         }
     };
