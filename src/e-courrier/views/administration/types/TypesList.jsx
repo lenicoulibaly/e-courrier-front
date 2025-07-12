@@ -23,9 +23,11 @@ import {
 import { ThemeMode } from 'config';
 import { useSearchTypes } from '../../../hooks/query/useSearchTypes';
 import Pagination from '../../../components/commons/Pagination';
+import ConfigureSubtypesModal from './ConfigureSubtypesModal';
 
 // assets
 import EditIcon from '@mui/icons-material/Edit';
+import SettingsIcon from '@mui/icons-material/Settings';
 
 // ==============================|| TYPES LIST ||============================== //
 
@@ -34,6 +36,8 @@ const TypesList = ({ searchTerm, groupCodes, onEditType }) => {
     const [filteredTypes, setFilteredTypes] = useState([]);
     const [page, setPage] = useState(0);
     const [pageSize, setPageSize] = useState(3);
+    const [configureSubtypesModalOpen, setConfigureSubtypesModalOpen] = useState(false);
+    const [selectedType, setSelectedType] = useState(null);
 
     // Fetch types using the useTypes hook with pagination
     const { data: typesPage, isLoading, isError, error } = useSearchTypes({ page: page, size: pageSize, key: searchTerm, groupCodes: groupCodes});
@@ -52,6 +56,18 @@ const TypesList = ({ searchTerm, groupCodes, onEditType }) => {
         {
             onEditType(type);
         }
+    };
+
+    // Handle configure subtypes button click
+    const handleConfigureSubtypes = (type) => {
+        setSelectedType(type);
+        setConfigureSubtypesModalOpen(true);
+    };
+
+    // Handle close configure subtypes modal
+    const handleCloseConfigureSubtypesModal = () => {
+        setConfigureSubtypesModalOpen(false);
+        setSelectedType(null);
     };
 
     // Handle page change
@@ -109,7 +125,7 @@ const TypesList = ({ searchTerm, groupCodes, onEditType }) => {
                                     <TableCell>{type.description}</TableCell>
                                     <TableCell>{type.groupCode}</TableCell>
                                     <TableCell align="center" sx={{ pr: 3 }}>
-                                        <Stack direction="row" justifyContent="center" alignItems="center">
+                                        <Stack direction="row" justifyContent="center" alignItems="center" spacing={1}>
                                             <Tooltip placement="top" title="Edit">
                                                 <IconButton 
                                                     color="primary" 
@@ -118,6 +134,16 @@ const TypesList = ({ searchTerm, groupCodes, onEditType }) => {
                                                     onClick={() => handleEdit(type)}
                                                 >
                                                     <EditIcon sx={{ fontSize: '1.1rem' }} />
+                                                </IconButton>
+                                            </Tooltip>
+                                            <Tooltip placement="top" title="Configurer les sous-types">
+                                                <IconButton 
+                                                    color="secondary" 
+                                                    aria-label="configure-subtypes" 
+                                                    size="large"
+                                                    onClick={() => handleConfigureSubtypes(type)}
+                                                >
+                                                    <SettingsIcon sx={{ fontSize: '1.1rem' }} />
                                                 </IconButton>
                                             </Tooltip>
                                         </Stack>
@@ -143,6 +169,13 @@ const TypesList = ({ searchTerm, groupCodes, onEditType }) => {
                     onSizeChange={handlePageSizeChange}
                 />
             )}
+
+            {/* Modal for configuring subtypes */}
+            <ConfigureSubtypesModal
+                open={configureSubtypesModalOpen}
+                handleClose={handleCloseConfigureSubtypesModal}
+                type={selectedType}
+            />
         </>
     );
 };

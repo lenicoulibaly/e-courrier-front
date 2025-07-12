@@ -9,7 +9,7 @@ import Button from '@mui/material/Button';
 import Paper from '@mui/material/Paper';
 import {TextField} from "@mui/material";
 import {useEffect, useRef, useState} from "react";
-import {transferListActions} from "../../../store/slices/transferListSlice";
+import {transferListActions} from "../../store/slices/transferListSlice";
 import {dispatch} from "../../../store";
 
 function not(a, b) {
@@ -40,7 +40,7 @@ const optionMatchesKey = (o, key)=>
 }
 
 
-export default function TransferList({initialList, preselected}) {
+export default function TransferList({initialList, preselected, onChange}) {
     const [checked, setChecked] = React.useState([]);
     const [left, setLeft] = React.useState([]);
     const [right, setRight] = React.useState([]);
@@ -50,12 +50,17 @@ export default function TransferList({initialList, preselected}) {
     {
         setLeft(initialList)
         setRight(preselected)
-    }, [])
+    }, [initialList, preselected])
 
     useEffect(()=>
     {
         dispatch(transferListActions.selectionChanged(right))
-    }, [right])
+
+        // Call the onChange prop if provided
+        if (onChange && typeof onChange === 'function') {
+            onChange(right);
+        }
+    }, [right, onChange])
 
     useEffect(()=>
     {
@@ -147,12 +152,12 @@ export default function TransferList({initialList, preselected}) {
 
         return (
             <Paper sx={{ width: 300, height: 230, overflow: 'auto' }}>
-                {position == 'right' && <TextField inputRef={keyRightRef} size={"small"} fullWidth value={keyRight} onChange={onKeyRightChange}/>}
-                {position == 'left' && <TextField inputRef={keyLeftRef} size={"small"} fullWidth value={keyLeft} onChange={onKeyLeftChange}/>}
+                {position == 'right' && <TextField id="transfer-list-filter-right" name="transfer-list-filter-right" inputRef={keyRightRef} size={"small"} fullWidth value={keyRight} onChange={onKeyRightChange}/>}
+                {position == 'left' && <TextField id="transfer-list-filter-left" name="transfer-list-filter-left" inputRef={keyLeftRef} size={"small"} fullWidth value={keyLeft} onChange={onKeyLeftChange}/>}
 
                 <List dense component="div" role="list">
                     {items?.map((value) => {
-                        const labelId = value?.label;
+                        const labelId = `label-${value?.id}`;
                         return optionMatchesKey(value, currentKey) ? (
                             <ListItem
                                 key={value?.id}
@@ -163,6 +168,8 @@ export default function TransferList({initialList, preselected}) {
                             >
                                 <ListItemIcon>
                                     <Checkbox
+                                        id={`checkbox-${value?.id}`}
+                                        name={`checkbox-${value?.id}`}
                                         checked={checked.indexOf(value) !== -1}
                                         tabIndex={-1}
                                         disableRipple

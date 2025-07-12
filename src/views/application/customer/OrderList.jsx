@@ -393,7 +393,7 @@ const OrderList = () => {
                                         </TableCell>
                                         <TableCell
                                             component="th"
-                                            id={labelId}
+                                            id={`${labelId}-name`}
                                             scope="row"
                                             onClick={(event) => handleClick(event, row.name)}
                                             sx={{ cursor: 'pointer' }}

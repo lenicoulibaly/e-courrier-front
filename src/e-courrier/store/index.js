@@ -9,6 +9,7 @@ import userSlice from './slices/userSlice';
 import authoritySlice from './slices/authoritySlice';
 import structureSlice from './slices/structureSlice';
 import typeSlice from './slices/typeSlice';
+import transferListSlice from './slices/transferListSlice';
 
 // Configuration de la persistance
 const persistConfig = {
@@ -23,7 +24,8 @@ const rootReducer = combineReducers({
     users: userSlice,
     authorities: authoritySlice,
     structures: structureSlice,
-    types: typeSlice
+    types: typeSlice,
+    transferList: transferListSlice,
 });
 
 // Reducer persisté
