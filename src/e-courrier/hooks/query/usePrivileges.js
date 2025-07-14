@@ -11,6 +11,13 @@ const PRIVILEGES_KEYS = {
 };
 
 // Hooks for fetching privileges
+export const useGetPrivilegesListByTypeCodes = (params = {}) => {
+    return useQuery({
+        queryKey: PRIVILEGES_KEYS.list(params),
+        queryFn: () => privilegeApi.getPrivilegesListByTypeCodes(params),
+    });
+};
+
 export const useSearchPrivileges = (params = {}) => {
     return useQuery({
         queryKey: PRIVILEGES_KEYS.list(params),

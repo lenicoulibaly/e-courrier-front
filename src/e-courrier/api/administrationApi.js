@@ -78,6 +78,12 @@ export const privilegeApi = {
     },
 
     // Recherche privilèges
+    getPrivilegesListByTypeCodes: async (params = {}) => {
+        const queryString = qs.stringify(params, { arrayFormat: 'repeat' });
+        const response = await apiClient.get(`/authorities/privileges/list?${queryString}`);
+        return response.data;
+    },
+
     searchPrivileges: async (params = {}) => {
         const queryString = qs.stringify(params, { arrayFormat: 'repeat' });
         const response = await apiClient.get(`/authorities/privileges/search?${queryString}`);
