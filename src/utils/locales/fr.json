@@ -178,5 +178,9 @@
     "account-settings": "Paramètres du compte",
     "logout": "Se déconnecter",
 
-    "more-items": "Plus d'articles"
+    "more-items": "Plus d'articles",
+
+    "administration": "Administration",
+    "types": "Types",
+    "privileges": "Privilèges"
 }

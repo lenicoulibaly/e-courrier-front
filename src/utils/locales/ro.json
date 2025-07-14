@@ -178,5 +178,9 @@
     "account-settings": "Setările contului",
     "logout": "Deconectare",
 
-    "more-items": "Mai multe articole"
+    "more-items": "Mai multe articole",
+
+    "administration": "Administrare",
+    "types": "Tipuri",
+    "privileges": "Privilegii"
 }

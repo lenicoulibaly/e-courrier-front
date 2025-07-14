@@ -17,7 +17,7 @@ import Autocomplete from '@mui/material/Autocomplete';
 
 // project imports
 import { gridSpacing } from 'store/constant';
-import { useUpdateType, useGetAllTypeGroups } from '../../../hooks/query/useSearchTypes';
+import { useUpdateType, useGetAllTypeGroups } from '../../../hooks/query/useTypes';
 import Modal from '../../../components/commons/Modal';
 import FloatingAlert from '../../../components/commons/FloatingAlert';
 import SimpleBackdrop from '../../../components/commons/SimpleBackdrop';

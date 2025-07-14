@@ -177,10 +177,15 @@ const ConfigureSubtypesModal = ({ open, handleClose, type }) => {
                                                     subtype => subtype.id === option.id
                                                 );
 
-                                                // Apply success color to preselected subtypes
+                                                // Apply distinctive styling to preselected subtypes
                                                 const tagProps = getTagProps({ index });
                                                 const chipStyle = isPreselected ? {
-                                                    color: theme.palette.success.main
+                                                    color: theme.palette.success.main,
+                                                    fontWeight: 'bolder',
+                                                    backgroundColor: theme.palette.success.light,
+                                                    borderColor: theme.palette.success.main,
+                                                    borderWidth: '1px',
+                                                    borderStyle: 'solid'
                                                 } : {};
 
                                                 return (

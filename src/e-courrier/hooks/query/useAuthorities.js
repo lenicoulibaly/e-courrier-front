@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { authorityApi, privilegeApi, roleApi, profileApi } from '../../api/administrationApi';
+import { authorityApi, roleApi, profileApi } from '../../api/administrationApi';
 
 // Query keys
 const AUTHORITIES_KEYS = {
@@ -7,13 +7,6 @@ const AUTHORITIES_KEYS = {
     user: (username) => [...AUTHORITIES_KEYS.all, 'user', username],
 };
 
-const PRIVILEGES_KEYS = {
-    all: ['privileges'],
-    lists: () => [...PRIVILEGES_KEYS.all, 'list'],
-    list: (filters) => [...PRIVILEGES_KEYS.lists(), { ...filters }],
-    byProfile: (profileCode, params) => [...PRIVILEGES_KEYS.all, 'byProfile', profileCode, { ...params }],
-    byRole: (roleCode, params) => [...PRIVILEGES_KEYS.all, 'byRole', roleCode, { ...params }],
-};
 
 const ROLES_KEYS = {
     all: ['roles'],
@@ -38,63 +31,6 @@ export const useUserAuthorities = (username) => {
     });
 };
 
-// Hooks for privileges
-export const usePrivileges = (params = {}) => {
-    return useQuery({
-        queryKey: PRIVILEGES_KEYS.list(params),
-        queryFn: () => privilegeApi.searchPrivileges(params),
-    });
-};
-
-export const usePrivilegesByProfile = (profileCode, params = {}) => {
-    return useQuery({
-        queryKey: PRIVILEGES_KEYS.byProfile(profileCode, params),
-        queryFn: () => privilegeApi.searchPrivilegesByProfile(profileCode, params),
-        enabled: !!profileCode,
-    });
-};
-
-export const usePrivilegesByRole = (roleCode, params = {}) => {
-    return useQuery({
-        queryKey: PRIVILEGES_KEYS.byRole(roleCode, params),
-        queryFn: () => privilegeApi.searchPrivilegesByRole(roleCode, params),
-        enabled: !!roleCode,
-    });
-};
-
-export const useCreatePrivilege = () => {
-    const queryClient = useQueryClient();
-    
-    return useMutation({
-        mutationFn: (privilegeData) => privilegeApi.createPrivilege(privilegeData),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: PRIVILEGES_KEYS.lists() });
-        },
-    });
-};
-
-export const useCreatePrivileges = () => {
-    const queryClient = useQueryClient();
-    
-    return useMutation({
-        mutationFn: (privilegesData) => privilegeApi.createPrivileges(privilegesData),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: PRIVILEGES_KEYS.lists() });
-        },
-    });
-};
-
-export const useUpdatePrivilege = () => {
-    const queryClient = useQueryClient();
-    
-    return useMutation({
-        mutationFn: (privilegeData) => privilegeApi.updatePrivilege(privilegeData),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: PRIVILEGES_KEYS.lists() });
-        },
-    });
-};
-
 // Hooks for roles
 export const useRoles = (params = {}) => {
     return useQuery({
@@ -113,7 +49,7 @@ export const useRolesByProfile = (profileCode, params = {}) => {
 
 export const useCreateRole = () => {
     const queryClient = useQueryClient();
-    
+
     return useMutation({
         mutationFn: (roleData) => roleApi.createRole(roleData),
         onSuccess: () => {
@@ -124,7 +60,7 @@ export const useCreateRole = () => {
 
 export const useUpdateRole = () => {
     const queryClient = useQueryClient();
-    
+
     return useMutation({
         mutationFn: (roleData) => roleApi.updateRole(roleData),
         onSuccess: () => {
@@ -151,7 +87,7 @@ export const useProfilesByUser = (userId, params = {}) => {
 
 export const useCreateProfile = () => {
     const queryClient = useQueryClient();
-    
+
     return useMutation({
         mutationFn: (profileData) => profileApi.createProfile(profileData),
         onSuccess: () => {
@@ -162,7 +98,7 @@ export const useCreateProfile = () => {
 
 export const useUpdateProfile = () => {
     const queryClient = useQueryClient();
-    
+
     return useMutation({
         mutationFn: (profileData) => profileApi.updateProfile(profileData),
         onSuccess: () => {
@@ -173,7 +109,7 @@ export const useUpdateProfile = () => {
 
 export const useAddProfileToUser = () => {
     const queryClient = useQueryClient();
-    
+
     return useMutation({
         mutationFn: (profileUserData) => profileApi.addProfileToUser(profileUserData),
         onSuccess: (data, variables) => {

@@ -28,13 +28,13 @@ import EditTypeModal from './EditTypeModal';
 import { IconSearch } from '@tabler/icons-react';
 import AddIcon from '@mui/icons-material/Add';
 import { useTheme } from '@mui/material/styles';
-import { useGetAllTypeGroups, useTypesByGroupCode } from '../../../hooks/query';
+import { useGetAllTypeGroups} from '../../../hooks/query';
 
 // ==============================|| TYPES MANAGEMENT ||============================== //
 
 const TypesManagement = () => {
     const navigate = useNavigate();
-    const [isLoading, setLoading] = useState(true);
+    const [, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedGroups, setSelectedGroups] = useState([]);
     const [openAddModal, setOpenAddModal] = useState(false);

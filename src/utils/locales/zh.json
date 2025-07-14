@@ -178,5 +178,9 @@
     "account-settings": "帳號設定",
     "logout": "登出",
 
-    "more-items": "更多項目"
+    "more-items": "更多項目",
+
+    "administration": "行政管理",
+    "types": "类型",
+    "privileges": "特权"
 }

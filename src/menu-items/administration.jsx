@@ -24,6 +24,13 @@ const administration = {
             type: 'item',
             icon: icons.IconList,
             url: '/administration/types'
+        },
+        {
+            id: 'privileges',
+            title: <FormattedMessage id="privileges" />,
+            type: 'item',
+            icon: icons.IconList,
+            url: '/administration/privileges'
         }
     ]
 };

@@ -178,5 +178,9 @@
     "account-settings": "Account settings",
     "logout": "Logout",
 
-    "more-items": "More Items"
+    "more-items": "More Items",
+
+    "administration": "Administration",
+    "types": "Types",
+    "privileges": "Privileges"
 }

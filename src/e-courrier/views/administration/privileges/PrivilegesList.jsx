@@ -21,53 +21,42 @@ import {
 
 // project imports
 import { ThemeMode } from 'config';
-import { useTypes } from '../../../hooks/query/useTypes';
+import { useSearchPrivileges } from '../../../hooks/query';
 import Pagination from '../../../components/commons/Pagination';
-import ConfigureSubtypesModal from './ConfigureSubtypesModal';
 
 // assets
 import EditIcon from '@mui/icons-material/Edit';
-import SettingsIcon from '@mui/icons-material/Settings';
 
-// ==============================|| TYPES LIST ||============================== //
+// ==============================|| PRIVILEGES LIST ||============================== //
 
-const TypesList = ({ searchTerm, groupCodes, onEditType }) => {
+const PrivilegesList = ({ searchTerm, privilegeTypeCodes, onEditPrivilege }) => {
     const theme = useTheme();
-    const [filteredTypes, setFilteredTypes] = useState([]);
+    const [filteredPrivileges, setFilteredPrivileges] = useState([]);
     const [page, setPage] = useState(0);
-    const [pageSize, setPageSize] = useState(3);
-    const [configureSubtypesModalOpen, setConfigureSubtypesModalOpen] = useState(false);
-    const [selectedType, setSelectedType] = useState(null);
+    const [pageSize, setPageSize] = useState(10);
 
-    // Fetch types using the useTypes hook with pagination
-    const { data: typesPage, isLoading, isError, error } = useTypes({ page: page, size: pageSize, key: searchTerm, groupCodes: groupCodes});
-    const types = typesPage?.content;
-    // Filter types based on search term and groups
+    // Fetch privileges using the useSearchPrivileges hook with pagination and type filtering
+    const { data: privilegesPage, isLoading, isError, error } = useSearchPrivileges({ 
+        page: page, 
+        size: pageSize, 
+        key: searchTerm,
+        privilegeTypeCodes: privilegeTypeCodes && privilegeTypeCodes.length > 0 ? privilegeTypeCodes : undefined
+    });
+    const privileges = privilegesPage?.content;
+
+    // Filter privileges based on search term and type codes
     useEffect(() => {
-        if (types) {
-            let filtered = [...types];
-            setFilteredTypes(filtered);
+        if (privileges) {
+            let filtered = [...privileges];
+            setFilteredPrivileges(filtered);
         }
-    }, [types, searchTerm, groupCodes]);
+    }, [privileges, searchTerm, privilegeTypeCodes]);
 
     // Handle edit button click
-    const handleEdit = (type) => {
-        if (onEditType)
-        {
-            onEditType(type);
+    const handleEdit = (privilege) => {
+        if (onEditPrivilege) {
+            onEditPrivilege(privilege);
         }
-    };
-
-    // Handle configure subtypes button click
-    const handleConfigureSubtypes = (type) => {
-        setSelectedType(type);
-        setConfigureSubtypesModalOpen(true);
-    };
-
-    // Handle close configure subtypes modal
-    const handleCloseConfigureSubtypesModal = () => {
-        setConfigureSubtypesModalOpen(false);
-        setSelectedType(null);
     };
 
     // Handle page change
@@ -94,7 +83,7 @@ const TypesList = ({ searchTerm, groupCodes, onEditType }) => {
     if (isError) {
         return (
             <Stack direction="row" justifyContent="center" alignItems="center" sx={{ py: 3 }}>
-                <Typography color="error">Error loading types: {error?.message || 'Unknown error'}</Typography>
+                <Typography color="error">Error loading privileges: {error?.message || 'Unknown error'}</Typography>
             </Stack>
         );
     }
@@ -106,44 +95,34 @@ const TypesList = ({ searchTerm, groupCodes, onEditType }) => {
                     <TableHead>
                         <TableRow>
                             <TableCell sx={{ pl: 3 }}>Code</TableCell>
-                            <TableCell>Label</TableCell>
+                            <TableCell>Nom</TableCell>
                             <TableCell>Description</TableCell>
-                            <TableCell>Group</TableCell>
+                            <TableCell>Type de Privilège</TableCell>
                             <TableCell align="center" sx={{ pr: 3 }}>
                                 Actions
                             </TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {filteredTypes.length > 0 ? (
-                            filteredTypes.map((type, index) => (
-                                <TableRow hover key={type.id || index}>
-                                    <TableCell sx={{ pl: 3 }}>{type.code}</TableCell>
+                        {filteredPrivileges && filteredPrivileges.length > 0 ? (
+                            filteredPrivileges.map((privilege, index) => (
+                                <TableRow hover key={privilege.id || index}>
+                                    <TableCell sx={{ pl: 3 }}>{privilege.code}</TableCell>
                                     <TableCell>
-                                        <Typography variant="subtitle1">{type.name}</Typography>
+                                        <Typography variant="subtitle1">{privilege.name}</Typography>
                                     </TableCell>
-                                    <TableCell>{type.description}</TableCell>
-                                    <TableCell>{type.groupCode}</TableCell>
+                                    <TableCell>{privilege.description}</TableCell>
+                                    <TableCell>{privilege.privilegeTypeCode}</TableCell>
                                     <TableCell align="center" sx={{ pr: 3 }}>
                                         <Stack direction="row" justifyContent="center" alignItems="center" spacing={1}>
-                                            <Tooltip placement="top" title="Edit">
+                                            <Tooltip placement="top" title="Modifier">
                                                 <IconButton 
                                                     color="primary" 
                                                     aria-label="edit" 
                                                     size="large"
-                                                    onClick={() => handleEdit(type)}
+                                                    onClick={() => handleEdit(privilege)}
                                                 >
                                                     <EditIcon sx={{ fontSize: '1.1rem' }} />
-                                                </IconButton>
-                                            </Tooltip>
-                                            <Tooltip placement="top" title="Configurer les sous-types">
-                                                <IconButton 
-                                                    color="secondary" 
-                                                    aria-label="configure-subtypes" 
-                                                    size="large"
-                                                    onClick={() => handleConfigureSubtypes(type)}
-                                                >
-                                                    <SettingsIcon sx={{ fontSize: '1.1rem' }} />
                                                 </IconButton>
                                             </Tooltip>
                                         </Stack>
@@ -153,37 +132,30 @@ const TypesList = ({ searchTerm, groupCodes, onEditType }) => {
                         ) : (
                             <TableRow>
                                 <TableCell colSpan={7} align="center">
-                                    <Typography variant="subtitle1">No types found</Typography>
+                                    <Typography variant="subtitle1">Aucun privilège trouvé</Typography>
                                 </TableCell>
                             </TableRow>
                         )}
                     </TableBody>
                 </Table>
             </TableContainer>
-            {typesPage && (
+            {privilegesPage && (
                 <Pagination 
-                    totalPages={typesPage.totalPages} 
+                    totalPages={privilegesPage.totalPages} 
                     currentPage={page} 
                     onPageChange={handlePageChange}
                     currentSize={pageSize}
                     onSizeChange={handlePageSizeChange}
                 />
             )}
-
-            {/* Modal for configuring subtypes */}
-            <ConfigureSubtypesModal
-                open={configureSubtypesModalOpen}
-                handleClose={handleCloseConfigureSubtypesModal}
-                type={selectedType}
-            />
         </>
     );
 };
 
-TypesList.propTypes = {
+PrivilegesList.propTypes = {
     searchTerm: PropTypes.string,
-    groupCodes: PropTypes.array,
-    onEditType: PropTypes.func
+    privilegeTypeCodes: PropTypes.arrayOf(PropTypes.string),
+    onEditPrivilege: PropTypes.func
 };
 
-export default TypesList;
+export default PrivilegesList;

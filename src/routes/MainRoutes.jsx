@@ -10,6 +10,7 @@ import { loader as productsLoader, productLoader } from 'api/products';
 
 // e-courrier administration routing
 const TypesManagement = Loadable(lazy(() => import('e-courrier/views/administration/types')));
+const PrivilegesManagement = Loadable(lazy(() => import('e-courrier/views/administration/privileges')));
 
 // dashboard routing
 const DashboardDefault = Loadable(lazy(() => import('views/dashboard/Default')));
@@ -694,6 +695,10 @@ const MainRoutes = {
         {
             path: '/administration/types',
             element: <TypesManagement />
+        },
+        {
+            path: '/administration/privileges',
+            element: <PrivilegesManagement />
         }
     ]
 };

@@ -13,18 +13,19 @@ import {
     MenuItem,
     Select,
     TextField,
+    Autocomplete,
+    CircularProgress,
 } from '@mui/material';
-import Autocomplete from '@mui/material/Autocomplete';
 
 // project imports
 import { gridSpacing } from 'store/constant';
-import { useCreateType, useGetAllTypeGroups } from '../../../hooks/query/useTypes';
+import { useCreatePrivilege, useTypesByGroupCode } from '../../../hooks/query';
 import Modal from '../../../components/commons/Modal';
 import FloatingAlert from '../../../components/commons/FloatingAlert';
 import SimpleBackdrop from '../../../components/commons/SimpleBackdrop';
 
 // validation schema
-const TypeSchema = Yup.object().shape({
+const PrivilegeSchema = Yup.object().shape({
     code: Yup.string()
         .required('Le code est requis')
         .max(50, 'La taille du code ne peut excéder 50 caractères'),
@@ -33,57 +34,62 @@ const TypeSchema = Yup.object().shape({
         .max(100, 'La taille du nom ne peut excéder 100 caractères'),
     description: Yup.string()
         .max(255, 'La description ne peut excéder 255 caractères'),
-    groupCode: Yup.string()
-        .required('Le groupe est obligatoire')
+    typeCode: Yup.string()
+        .required('Le code du type est obligatoire'),
+    typeName: Yup.string()
+        .required('Le nom du type est obligatoire'),
+    privilegeTypeCode: Yup.string()
+        .required('Le code du type de privilège est obligatoire')
 });
 
-// ==============================|| ADD TYPE MODAL ||============================== //
+// ==============================|| ADD PRIVILEGE MODAL ||============================== //
 
-const AddTypeModal = ({ open, handleClose }) => {
-    // Fetch type groups for dropdown
-    const { data: typeGroups = [], isLoading: isLoadingGroups } = useGetAllTypeGroups();
+const AddPrivilegeModal = ({ open, handleClose }) => {
+    // Mutation for creating a new privilege
+    const { mutate: createPrivilege, isPending: isCreating, isSuccess: isCreateSuccess, isError: isCreateError, error: createError } = useCreatePrivilege();
 
-    // Mutation for creating a new type
-    const { mutate: createType, isPending: isCreating, isSuccess: isCreateSuccess, isError: isCreateError, error : createError } = useCreateType();
-
+    // Fetch privilege types
+    const { data: privilegeTypes, isLoading: isLoadingTypes } = useTypesByGroupCode('PRV');
 
     // Initial form values
     const initialValues = {
         code: '',
         name: '',
         description: '',
-        groupCode: ''
+        typeCode: 'PRV',
+        typeName: 'Privilege',
+        privilegeTypeCode: ''
     };
 
     // Handle form submission
-    const handleSubmit = (values, { setSubmitting, resetForm }) =>
-    {
-        createType(values, {
+    const handleSubmit = (values, { setSubmitting, resetForm }) => {
+        createPrivilege(values, {
             onSuccess: () => {
                 setSubmitting(false);
                 resetForm();
             },
             onError: (error) => {
-                console.error('Error creating type:', error.response.data);
+                console.error('Error creating privilege:', error.response?.data);
                 setSubmitting(false);
             }
         });
     };
+
     return (
         <Modal
             open={open}
             handleClose={handleClose}
-            title="Création d'un nouveau type"
+            title="Création d'un nouveau privilège"
             width="sm"
             actionLabel="Enregistrer"
             actionDisabled={isCreating}
             handleConfirmation={() => {
-                document.getElementById('add-type-form').dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+                document.getElementById('add-privilege-form').dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
             }}
         >
-            <Formik initialValues={initialValues} validationSchema={TypeSchema} onSubmit={handleSubmit}>
-                {({ errors, setFieldValue, touched, handleChange, handleBlur, values, isSubmitting }) => (
-                    <Form id="add-type-form">
+            <Formik initialValues={initialValues} validationSchema={PrivilegeSchema} onSubmit={handleSubmit}>
+                {({ errors, touched, handleChange, handleBlur, values, isSubmitting }) => (
+                    <Form id="add-privilege-form">
                         <Grid container spacing={gridSpacing}>
                             <Grid item xs={12} md={6}>
                                 <Field
@@ -107,7 +113,7 @@ const AddTypeModal = ({ open, handleClose }) => {
                                     fullWidth
                                     id="name"
                                     name="name"
-                                    label="Nom du type"
+                                    label="Nom"
                                     value={values.name}
                                     onChange={handleChange}
                                     onBlur={handleBlur}
@@ -116,30 +122,39 @@ const AddTypeModal = ({ open, handleClose }) => {
                                 />
                             </Grid>
                             <Grid item xs={12}>
-                                <FormControl fullWidth error={touched.groupCode && Boolean(errors.groupCode)}>
-                                    <Autocomplete
-                                        id="groupCode"
-                                        size="small"
-                                        options={isLoadingGroups ? [] : typeGroups}
-                                        getOptionLabel={(option) => option.name || ''}
-                                        value={
-                                            typeGroups.find((group) => group.groupCode === values.groupCode) || null
-                                        }
-                                        onChange={(event, newValue) => {
-                                            setFieldValue('groupCode', newValue ? newValue.groupCode : '');
-                                        }}
-                                        onBlur={handleBlur}
-                                        loading={isLoadingGroups}
-                                        renderInput={(params) => (
-                                            <TextField
-                                                {...params}
-                                                label="Group"
-                                                error={touched.groupCode && Boolean(errors.groupCode)}
-                                                helperText={touched.groupCode && errors.groupCode}
-                                            />
-                                        )}
-                                    />
-                                </FormControl>
+                                <Autocomplete
+                                    id="privilegeTypeCode-autocomplete"
+                                    options={privilegeTypes || []}
+                                    getOptionLabel={(option) => `${option.code} - ${option.name}`}
+                                    value={privilegeTypes?.find(type => type.code === values.privilegeTypeCode) || null}
+                                    onChange={(event, newValue) => {
+                                        handleChange({
+                                            target: {
+                                                name: 'privilegeTypeCode',
+                                                value: newValue ? newValue.code : ''
+                                            }
+                                        });
+                                    }}
+                                    loading={isLoadingTypes}
+                                    renderInput={(params) => (
+                                        <TextField
+                                            {...params}
+                                            size="small"
+                                            label="Code du type de privilège"
+                                            error={touched.privilegeTypeCode && Boolean(errors.privilegeTypeCode)}
+                                            helperText={touched.privilegeTypeCode && errors.privilegeTypeCode}
+                                            InputProps={{
+                                                ...params.InputProps,
+                                                endAdornment: (
+                                                    <>
+                                                        {isLoadingTypes ? <CircularProgress color="inherit" size={20} /> : null}
+                                                        {params.InputProps.endAdornment}
+                                                    </>
+                                                ),
+                                            }}
+                                        />
+                                    )}
+                                />
                             </Grid>
                             <Grid item xs={12}>
                                 <Field
@@ -162,15 +177,19 @@ const AddTypeModal = ({ open, handleClose }) => {
                     </Form>
                 )}
             </Formik>
-            <FloatingAlert open={isCreateError || isCreateSuccess} feedBackMessages={isCreateError ? createError?.response.data : isCreateSuccess ? 'Type créé avec succès' : ''} severity={isCreateError ? 'error' : isCreateSuccess ? 'success' : 'info'}/>
+            <FloatingAlert 
+                open={isCreateError || isCreateSuccess} 
+                feedBackMessages={isCreateError ? createError?.response?.data : isCreateSuccess ? 'Privilège créé avec succès' : ''} 
+                severity={isCreateError ? 'error' : isCreateSuccess ? 'success' : 'info'}
+            />
             <SimpleBackdrop open={isCreating}/>
         </Modal>
     );
 };
 
-AddTypeModal.propTypes = {
+AddPrivilegeModal.propTypes = {
     open: PropTypes.bool.isRequired,
     handleClose: PropTypes.func.isRequired
 };
 
-export default AddTypeModal;
+export default AddPrivilegeModal;

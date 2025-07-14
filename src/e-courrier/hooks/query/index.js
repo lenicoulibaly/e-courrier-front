@@ -2,4 +2,5 @@
 export * from './useUsers';
 export * from './useStructures';
 export * from './useAuthorities';
-export * from './useSearchTypes';
+export * from './useTypes';
+export * from './usePrivileges';
