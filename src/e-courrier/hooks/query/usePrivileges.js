@@ -63,14 +63,3 @@ export const useUpdatePrivilege = () => {
         },
     });
 };
-
-export const useCreatePrivileges = () => {
-    const queryClient = useQueryClient();
-
-    return useMutation({
-        mutationFn: (privilegesData) => privilegeApi.createPrivileges(privilegesData),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: PRIVILEGES_KEYS.lists() });
-        },
-    });
-};

@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { authorityApi, roleApi, profileApi } from '../../api/administrationApi';
+import { authorityApi, roleApi, profileApi, privilegeApi } from '../../api/administrationApi';
 
 // Query keys
 const AUTHORITIES_KEYS = {
@@ -20,6 +20,11 @@ const PROFILES_KEYS = {
     lists: () => [...PROFILES_KEYS.all, 'list'],
     list: (filters) => [...PROFILES_KEYS.lists(), { ...filters }],
     byUser: (userId, params) => [...PROFILES_KEYS.all, 'byUser', userId, { ...params }],
+};
+
+const PRIVILEGES_KEYS = {
+    all: ['privileges'],
+    byRoleCodes: (roleCodes) => [...PRIVILEGES_KEYS.all, 'byRoleCodes', roleCodes],
 };
 
 // Hooks for fetching authorities
@@ -72,7 +77,7 @@ export const useUpdateRole = () => {
 };
 
 // Hooks for profiles
-export const useProfiles = (params = {}) => {
+export const useSearchProfile = (params = {}) => {
     return useQuery({
         queryKey: PROFILES_KEYS.list(params),
         queryFn: () => profileApi.searchProfiles(params),
@@ -118,5 +123,14 @@ export const useAddProfileToUser = () => {
             queryClient.invalidateQueries({ queryKey: PROFILES_KEYS.byUser(variables.userId) });
             queryClient.invalidateQueries({ queryKey: AUTHORITIES_KEYS.all });
         },
+    });
+};
+
+// Hook for fetching privileges by role codes
+export const usePrivilegesByRoleCodes = (roleCodes = []) => {
+    return useQuery({
+        queryKey: PRIVILEGES_KEYS.byRoleCodes(roleCodes),
+        queryFn: () => privilegeApi.getPrivilegesByRoleCodes(roleCodes),
+        enabled: roleCodes.length > 0,
     });
 };

@@ -182,5 +182,7 @@
 
     "administration": "Administrare",
     "types": "Tipuri",
-    "privileges": "Privilegii"
+    "privileges": "Privilegii",
+    "roles": "Roluri",
+    "profiles": "Profiluri"
 }

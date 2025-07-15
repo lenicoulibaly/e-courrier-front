@@ -182,5 +182,7 @@
 
     "administration": "Administration",
     "types": "Types",
-    "privileges": "Privilèges"
+    "privileges": "Privilèges",
+    "roles": "Rôles",
+    "profiles": "Profils"
 }

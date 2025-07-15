@@ -182,5 +182,7 @@
 
     "administration": "行政管理",
     "types": "类型",
-    "privileges": "特权"
+    "privileges": "特权",
+    "roles": "角色",
+    "profiles": "配置文件"
 }

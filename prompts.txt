@@ -1,0 +1,92 @@
+Ceci est le DTO de gestion des profiles
+{
+    "code": "PRFL_ADMIN_GLOBAL",
+    "name": "Profile administrateur global",
+    "description": "Profile administrateur global",
+    "typeCode": "PRFL",
+    "children": [{"code": "ROL_ADMIN_GLOBAL"}]
+}
+
+Implementer la gestion des profiles(liste, creation, modification, visualisation du detail
+1-pour la liste:
+	prévoir un champ de recherche
+	pas de liste déroulante de filtre
+	Ne pas afficher le typeCode (Il est identique pour tous les items
+	faire la pagination
+	utiliser useSearchProfile({key: ''})
+	Afficher quelque part près du tableau le nombre total d'éléments
+	le resultat de la rechercher est sous la forme suivante :
+
+        {
+            "content": [
+            {
+            "code": "PRFL_ADMIN_FONC",
+            "roleCode": null,
+            "profileCode": "PRFL_ADMIN_FONC",
+            "privilegeCode": null,
+            "name": "Profile administrateur fonctionnel",
+            "description": "Profile administrateur fonctionnel",
+            "typeCode": "PRFL",
+            "typeName": "Profil",
+            "privilegeTypeCode": null,
+            "privilegeTypeName": null,
+            "children": null
+            },
+            {
+            "code": "PRFL_ADMIN_GLOBAL",
+            "roleCode": null,
+            "profileCode": "PRFL_ADMIN_GLOBAL",
+            "privilegeCode": null,
+            "name": "Profile administrateur global",
+            "description": "Profile administrateur global",
+            "typeCode": "PRFL",
+            "typeName": "Profil",
+            "privilegeTypeCode": null,
+            "privilegeTypeName": null,
+            "children": null
+            },
+            {
+            "code": "PRFL_ADMIN_TECH",
+            "roleCode": null,
+            "profileCode": "PRFL_ADMIN_TECH",
+            "privilegeCode": null,
+            "name": "Profile administrateur technique",
+            "description": "Profile administrateur technique",
+            "typeCode": "PRFL",
+            "typeName": "Profil",
+            "privilegeTypeCode": null,
+            "privilegeTypeName": null,
+            "children": null
+            }
+            ],
+            "totalElements": 3,
+            "totalPages": 1,
+            "page": 0,
+            "size": 10,
+            "numberOfElements": 3
+        }
+
+2-pour la création:
+    Utiliser une fenêtre modale (Utiliser le composant src/e-courrier/components/commons/Modal)
+	Fixer le champ typeCode à "PRFL",
+	Ne pas afficher typeCode dans le formulaire
+	Ajouter dans la fonction et le hook qui permettent de ramener la liste des privileges pour une liste de roleCode passé en paramètre. l'endpoint est `/privileges/list/by-role-codes?roleCode=`
+	Prévoir une autocomplete pour le choix des roles
+	Prévoir un champs texte multiline pour afficher en lecture seule la liste des privilèges liées aux roles sélectionnés
+
+3- Pour la modification :
+    Utiliser une fenêtre modale (Utiliser le composant src/e-courrier/components/commons/Modal)
+    Préselectionner les roles liés au profile concerné dans une autocomplete
+    Afficher en lecture seule les privilèges correspondant
+    Dans l'autocomplete, les roles préselectionné doivent être en gras et noir; aussi bien dans la liste déroulante de l'autocomplete que dans la zone de texte de l'autocomplete
+    Les roles préselectionnés ne doivent pas avoir de couleur de fond lorsqu'ils sont déselectionnés. doivent cependant restés gras et noirs dans la liste déroulante de l'autocomplete
+    Lorsqu'un role est préselectionné et qu'on clique sur lui dans la liste déroulante, il doit être déslectionné.
+    Il ne doit pas avoir de doublons dans la zone de texte de la liste déroulante.
+    Prévoir un champs texte multiline pour afficher en lecture seule la liste des privilèges liées aux roles sélectionnés
+
+4-Pour la visualisation du détail:
+    Afficher dans une modale (Utiliser le composant src/e-courrier/components/commons/Modal)
+    Tous les champs sont en lecture seule
+
+5- Ajoute un élément au menu permettant d'accéder à la gestion des profiles et configure le routage pour cela
+

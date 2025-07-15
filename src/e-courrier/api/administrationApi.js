@@ -80,7 +80,12 @@ export const privilegeApi = {
     // Recherche privilèges
     getPrivilegesListByTypeCodes: async (params = {}) => {
         const queryString = qs.stringify(params, { arrayFormat: 'repeat' });
-        const response = await apiClient.get(`/authorities/privileges/list?${queryString}`);
+        const response = await apiClient.get(`/authorities/privileges/list/by-privilege-type-codes?${queryString}`);
+        return response.data;
+    },
+    getPrivilegesByRoleCodes: async (roleCodes = []) => {
+        const queryString = qs.stringify({ roleCodes: roleCodes }, { arrayFormat: 'repeat' });
+        const response = await apiClient.get(`/authorities/privileges/list/by-role-codes?${queryString}`);
         return response.data;
     },
 
