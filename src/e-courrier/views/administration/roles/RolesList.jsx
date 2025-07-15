@@ -31,7 +31,7 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 
 // ==============================|| ROLES LIST ||============================== //
 
-const RolesList = ({ searchTerm, privilegeTypeCodes, onEditRole }) => {
+const RolesList = ({ searchTerm, onEditRole }) => {
     const theme = useTheme();
     const [filteredRoles, setFilteredRoles] = useState([]);
     const [page, setPage] = useState(0);
@@ -210,7 +210,6 @@ const RolesList = ({ searchTerm, privilegeTypeCodes, onEditRole }) => {
 
 RolesList.propTypes = {
     searchTerm: PropTypes.string,
-    privilegeTypeCodes: PropTypes.arrayOf(PropTypes.string),
     onEditRole: PropTypes.func
 };
 
