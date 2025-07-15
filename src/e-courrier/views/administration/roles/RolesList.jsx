@@ -23,9 +23,11 @@ import {
 import { ThemeMode } from 'config';
 import { useRoles } from '../../../hooks/query/useAuthorities';
 import Pagination from '../../../components/commons/Pagination';
+import ViewRoleModal from './ViewRoleModal';
 
 // assets
 import EditIcon from '@mui/icons-material/Edit';
+import VisibilityIcon from '@mui/icons-material/Visibility';
 
 // ==============================|| ROLES LIST ||============================== //
 
@@ -34,6 +36,8 @@ const RolesList = ({ searchTerm, privilegeTypeCodes, onEditRole }) => {
     const [filteredRoles, setFilteredRoles] = useState([]);
     const [page, setPage] = useState(0);
     const [pageSize, setPageSize] = useState(10);
+    const [openViewModal, setOpenViewModal] = useState(false);
+    const [selectedRole, setSelectedRole] = useState(null);
 
     // Fetch roles using the useRoles hook with pagination
     const { data: rolesPage, isLoading, isError, error } = useRoles({ 
@@ -56,6 +60,18 @@ const RolesList = ({ searchTerm, privilegeTypeCodes, onEditRole }) => {
         if (onEditRole) {
             onEditRole(role);
         }
+    };
+
+    // Handle view button click
+    const handleView = (role) => {
+        setSelectedRole(role);
+        setOpenViewModal(true);
+    };
+
+    // Handle close view modal
+    const handleCloseViewModal = () => {
+        setOpenViewModal(false);
+        setSelectedRole(null);
     };
 
     // Handle page change
@@ -136,6 +152,16 @@ const RolesList = ({ searchTerm, privilegeTypeCodes, onEditRole }) => {
                                     </TableCell>
                                     <TableCell align="center" sx={{ pr: 3 }}>
                                         <Stack direction="row" justifyContent="center" alignItems="center" spacing={1}>
+                                            <Tooltip placement="top" title="Voir les détails">
+                                                <IconButton 
+                                                    color="info" 
+                                                    aria-label="view" 
+                                                    size="large"
+                                                    onClick={() => handleView(role)}
+                                                >
+                                                    <VisibilityIcon sx={{ fontSize: '1.1rem' }} />
+                                                </IconButton>
+                                            </Tooltip>
                                             <Tooltip placement="top" title="Modifier">
                                                 <IconButton 
                                                     color="primary" 
@@ -167,6 +193,15 @@ const RolesList = ({ searchTerm, privilegeTypeCodes, onEditRole }) => {
                     onPageChange={handlePageChange}
                     currentSize={pageSize}
                     onSizeChange={handlePageSizeChange}
+                />
+            )}
+
+            {/* View Role Modal */}
+            {selectedRole && (
+                <ViewRoleModal 
+                    open={openViewModal} 
+                    handleClose={handleCloseViewModal} 
+                    role={selectedRole} 
                 />
             )}
         </>
