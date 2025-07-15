@@ -219,12 +219,33 @@ const EditRoleModal = ({ open, handleClose, role }) => {
                                         ) : (
                                             <Autocomplete
                                                 multiple
+                                                disableCloseOnSelect={true}
                                                 id="privileges-select"
                                                 options={privileges || []}
                                                 getOptionLabel={(option) => `${option.code} - ${option.name}`}
                                                 value={values.children}
-                                                onChange={(event, newValue) => {
-                                                    setFieldValue('children', newValue);
+                                                onChange={(event, newValue, reason, details) => {
+                                                    // If a privilege is clicked in the dropdown, we need to handle it properly
+                                                    if (reason === 'selectOption' || reason === 'removeOption') {
+                                                        // Find if the option already exists in the current selection
+                                                        const optionExists = values.children.some(
+                                                            child => details?.option && child.code === details.option.code
+                                                        );
+
+                                                        if (reason === 'selectOption' && optionExists) {
+                                                            // If trying to select an option that already exists, remove it instead
+                                                            const filteredValues = values.children.filter(
+                                                                child => details?.option && child.code !== details.option.code
+                                                            );
+                                                            setFieldValue('children', filteredValues);
+                                                        } else {
+                                                            // Otherwise, use the new value provided by Autocomplete
+                                                            setFieldValue('children', newValue);
+                                                        }
+                                                    } else {
+                                                        // For other cases (like clear, blur, etc.), use the new value
+                                                        setFieldValue('children', newValue);
+                                                    }
                                                 }}
                                                 loading={isLoadingPrivileges}
                                                 renderInput={(params) => (
@@ -243,6 +264,10 @@ const EditRoleModal = ({ open, handleClose, role }) => {
                                                                     {params.InputProps.endAdornment}
                                                                 </>
                                                             ),
+                                                            style: originalPrivileges.length > 0 ? {
+                                                                fontWeight: 'bold',
+                                                                color: '#000000'
+                                                            } : {}
                                                         }}
                                                     />
                                                 )}
@@ -255,15 +280,28 @@ const EditRoleModal = ({ open, handleClose, role }) => {
                                                                 size="small"
                                                                 {...getTagProps({ index })}
                                                                 sx={{
-                                                                    backgroundColor: isOriginal ? 'primary.light' : 'default',
+                                                                    bgcolor: isOriginal ? '#bbdefb' : 'transparent',
                                                                     '& .MuiChip-label': {
-                                                                        color: isOriginal ? 'primary.contrastText' : 'text.primary'
+                                                                        color: isOriginal ? '#000000' : 'inherit',
+                                                                        fontWeight: isOriginal ? 'bold' : 'normal'
                                                                     }
                                                                 }}
                                                             />
                                                         );
                                                     })
                                                 }
+                                                renderOption={(props, option, { selected }) => {
+                                                    const isOriginal = isOriginalPrivilege(option);
+                                                    return (
+                                                        <li {...props} style={{ 
+                                                            fontWeight: isOriginal ? 'bold' : 'normal',
+                                                            color: isOriginal ? '#000000' : 'inherit',
+                                                            backgroundColor: selected ? '#bbdefb' : 'transparent'
+                                                        }}>
+                                                            {`${option.code} - ${option.name}`}
+                                                        </li>
+                                                    );
+                                                }}
                                             />
                                         )}
                                     </Grid>

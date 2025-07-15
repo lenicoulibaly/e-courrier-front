@@ -63,8 +63,10 @@ export const useUpdateRole = () => {
 
     return useMutation({
         mutationFn: (roleData) => roleApi.updateRole(roleData),
-        onSuccess: () => {
+        onSuccess: (data, variables) => {
             queryClient.invalidateQueries({ queryKey: ROLES_KEYS.lists() });
+            // Invalidate privileges by role queries for the updated role
+            queryClient.invalidateQueries({ queryKey: ['privileges', 'byRole', variables.code] });
         },
     });
 };
