@@ -2,12 +2,15 @@
 import { FormattedMessage } from 'react-intl';
 
 // assets
-import { IconSettings, IconList } from '@tabler/icons-react';
+import { IconSettings, IconCategory, IconShield, IconUserCircle, IconUser } from '@tabler/icons-react';
 
 // constant
 const icons = {
     IconSettings,
-    IconList
+    IconCategory,
+    IconShield,
+    IconUserCircle,
+    IconUser
 };
 
 // ==============================|| ADMINISTRATION MENU ITEMS ||============================== //
@@ -22,28 +25,28 @@ const administration = {
             id: 'types',
             title: <FormattedMessage id="types" />,
             type: 'item',
-            icon: icons.IconList,
+            icon: icons.IconCategory,
             url: '/administration/types'
         },
         {
             id: 'privileges',
             title: <FormattedMessage id="privileges" />,
             type: 'item',
-            icon: icons.IconList,
+            icon: icons.IconShield,
             url: '/administration/privileges'
         },
         {
             id: 'roles',
             title: <FormattedMessage id="roles" />,
             type: 'item',
-            icon: icons.IconList,
+            icon: icons.IconUserCircle,
             url: '/administration/roles'
         },
         {
             id: 'profiles',
             title: <FormattedMessage id="profiles" />,
             type: 'item',
-            icon: icons.IconList,
+            icon: icons.IconUser,
             url: '/administration/profiles'
         }
     ]
