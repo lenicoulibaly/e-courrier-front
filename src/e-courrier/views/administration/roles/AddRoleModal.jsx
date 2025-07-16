@@ -192,7 +192,7 @@ const AddRoleModal = ({ open, handleClose }) => {
                                         />
                                     </Grid>
                                     <Grid item xs={12}>
-                                        <Autocomplete
+                                        <Autocomplete disableCloseOnSelect
                                             multiple
                                             id="privileges-select"
                                             options={privileges || []}

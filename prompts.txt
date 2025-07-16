@@ -90,3 +90,6 @@ Implementer la gestion des profiles(liste, creation, modification, visualisation
 
 5- Ajoute un élément au menu permettant d'accéder à la gestion des profiles et configure le routage pour cela
 
+Débogage après réponse :
+Remplace tous les champs de texte multiselect en lecture seule par des autocomplete en lecture seule
+
