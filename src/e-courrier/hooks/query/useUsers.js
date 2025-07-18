@@ -11,7 +11,7 @@ const USERS_KEYS = {
 };
 
 // Hooks for fetching users
-export const useUsers = (params = {}) => {
+export const useSearchUsers = (params = {}) => {
     return useQuery({
         queryKey: USERS_KEYS.list(params),
         queryFn: () => userApi.searchUsers(params),
@@ -21,7 +21,7 @@ export const useUsers = (params = {}) => {
 // Hooks for mutations
 export const useCreateUser = () => {
     const queryClient = useQueryClient();
-    
+
     return useMutation({
         mutationFn: (userData) => userApi.createUser(userData),
         onSuccess: () => {
@@ -30,9 +30,20 @@ export const useCreateUser = () => {
     });
 };
 
+export const useCreateUserWithProfile = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: (userData) => userApi.createUserWithProfile(userData),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: USERS_KEYS.lists() });
+        },
+    });
+};
+
 export const useUpdateUser = () => {
     const queryClient = useQueryClient();
-    
+
     return useMutation({
         mutationFn: (userData) => userApi.updateUser(userData),
         onSuccess: (data) => {
@@ -44,7 +55,7 @@ export const useUpdateUser = () => {
 
 export const useActivateUser = () => {
     const queryClient = useQueryClient();
-    
+
     return useMutation({
         mutationFn: (userData) => userApi.activateUser(userData),
         onSuccess: (data) => {
@@ -56,7 +67,7 @@ export const useActivateUser = () => {
 
 export const useBlockUser = () => {
     const queryClient = useQueryClient();
-    
+
     return useMutation({
         mutationFn: (userId) => userApi.blockUser(userId),
         onSuccess: (data, variables) => {
@@ -68,7 +79,7 @@ export const useBlockUser = () => {
 
 export const useUnblockUser = () => {
     const queryClient = useQueryClient();
-    
+
     return useMutation({
         mutationFn: (userId) => userApi.unblockUser(userId),
         onSuccess: (data, variables) => {

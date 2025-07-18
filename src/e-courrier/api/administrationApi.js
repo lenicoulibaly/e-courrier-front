@@ -15,6 +15,10 @@ export const userApi = {
         const response = await apiClient.post('/users/create', userData);
         return response.data;
     },
+    createUserWithProfile: async (userData) => {
+        const response = await apiClient.post('/users/create-with-profile', userData);
+        return response.data;
+    },
     updateUser: async (userData) => {
         const response = await apiClient.put('/users/update', userData);
         return response.data;
@@ -198,6 +202,12 @@ export const structureApi = {
         const response = await apiClient.get(`/structures/possible-parents?${queryString}`);
         return response.data;
     },
+    getVisibleStructures: async () => {
+        const response = await apiClient.get(`/structures/user-visible-structures`);
+        return response.data;
+    },
+
+
 
     // Gestion anchor (ancrage)
     getChangeAnchorDto: async (strId) => {

@@ -12,6 +12,7 @@ const STRUCTURES_KEYS = {
     possibleParents: (params) => [...STRUCTURES_KEYS.all, 'possibleParents', { ...params }],
     changeAnchorDto: (id) => [...STRUCTURES_KEYS.all, 'changeAnchorDto', id],
     updateDto: (id) => [...STRUCTURES_KEYS.all, 'updateDto', id],
+    visible: () => [...STRUCTURES_KEYS.all, 'visible'],
 };
 
 // Hooks for fetching structures
@@ -52,41 +53,51 @@ export const useUpdateDto = (strId) => {
     });
 };
 
+export const useVisibleStructures = () => {
+    return useQuery({
+        queryKey: STRUCTURES_KEYS.visible(),
+        queryFn: () => structureApi.getVisibleStructures(),
+    });
+};
+
 // Hooks for mutations
 export const useCreateStructure = () => {
     const queryClient = useQueryClient();
-    
+
     return useMutation({
         mutationFn: (structureData) => structureApi.createStructure(structureData),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: STRUCTURES_KEYS.lists() });
             queryClient.invalidateQueries({ queryKey: STRUCTURES_KEYS.root() });
+            queryClient.invalidateQueries({ queryKey: STRUCTURES_KEYS.visible() });
         },
     });
 };
 
 export const useUpdateStructure = () => {
     const queryClient = useQueryClient();
-    
+
     return useMutation({
         mutationFn: (structureData) => structureApi.updateStructure(structureData),
         onSuccess: (data) => {
             queryClient.invalidateQueries({ queryKey: STRUCTURES_KEYS.detail(data.id) });
             queryClient.invalidateQueries({ queryKey: STRUCTURES_KEYS.lists() });
             queryClient.invalidateQueries({ queryKey: STRUCTURES_KEYS.root() });
+            queryClient.invalidateQueries({ queryKey: STRUCTURES_KEYS.visible() });
         },
     });
 };
 
 export const useChangeAnchor = () => {
     const queryClient = useQueryClient();
-    
+
     return useMutation({
         mutationFn: (anchorData) => structureApi.changeAnchor(anchorData),
         onSuccess: (data) => {
             queryClient.invalidateQueries({ queryKey: STRUCTURES_KEYS.detail(data.id) });
             queryClient.invalidateQueries({ queryKey: STRUCTURES_KEYS.lists() });
             queryClient.invalidateQueries({ queryKey: STRUCTURES_KEYS.root() });
+            queryClient.invalidateQueries({ queryKey: STRUCTURES_KEYS.visible() });
         },
     });
 };
