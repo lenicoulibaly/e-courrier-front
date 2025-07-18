@@ -18,6 +18,10 @@ import theme3 from 'assets/scss/_theme3.module.scss';
 import theme4 from 'assets/scss/_theme4.module.scss';
 import theme5 from 'assets/scss/_theme5.module.scss';
 import theme6 from 'assets/scss/_theme6.module.scss';
+import theme7 from 'assets/scss/_theme7.module.scss';
+import theme8 from 'assets/scss/_theme8.module.scss';
+import theme9 from 'assets/scss/_theme9.module.scss';
+import theme10 from 'assets/scss/_theme10.module.scss';
 
 // assets
 import { IconCheck } from '@tabler/icons-react';
@@ -89,6 +93,26 @@ const PresetColorPage = () => {
             id: 'theme6',
             primary: mode === ThemeMode.DARK ? theme6.darkPrimaryMain : theme6.primaryMain,
             secondary: mode === ThemeMode.DARK ? theme6.darkSecondaryMain : theme6.secondaryMain
+        },
+        {
+            id: 'theme7',
+            primary: mode === ThemeMode.DARK ? theme7.darkPrimaryMain : theme7.primaryMain,
+            secondary: mode === ThemeMode.DARK ? theme7.darkSecondaryMain : theme7.secondaryMain
+        },
+        {
+            id: 'theme8',
+            primary: mode === ThemeMode.DARK ? theme8.darkPrimaryMain : theme8.primaryMain,
+            secondary: mode === ThemeMode.DARK ? theme8.darkSecondaryMain : theme8.secondaryMain
+        },
+        {
+            id: 'theme9',
+            primary: mode === ThemeMode.DARK ? theme9.darkPrimaryMain : theme9.primaryMain,
+            secondary: mode === ThemeMode.DARK ? theme9.darkSecondaryMain : theme9.secondaryMain
+        },
+        {
+            id: 'theme10',
+            primary: mode === ThemeMode.DARK ? theme10.darkPrimaryMain : theme10.primaryMain,
+            secondary: mode === ThemeMode.DARK ? theme10.darkSecondaryMain : theme10.secondaryMain
         }
     ];
 

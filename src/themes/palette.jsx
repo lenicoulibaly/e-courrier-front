@@ -12,6 +12,10 @@ import theme3 from 'assets/scss/_theme3.module.scss';
 import theme4 from 'assets/scss/_theme4.module.scss';
 import theme5 from 'assets/scss/_theme5.module.scss';
 import theme6 from 'assets/scss/_theme6.module.scss';
+import theme7 from 'assets/scss/_theme7.module.scss';
+import theme8 from 'assets/scss/_theme8.module.scss';
+import theme9 from 'assets/scss/_theme9.module.scss';
+import theme10 from 'assets/scss/_theme10.module.scss';
 
 // ==============================|| DEFAULT THEME - PALETTE ||============================== //
 
@@ -35,6 +39,18 @@ const Palette = (mode, presetColor) => {
             break;
         case 'theme6':
             colors = theme6;
+            break;
+        case 'theme7':
+            colors = theme7;
+            break;
+        case 'theme8':
+            colors = theme8;
+            break;
+        case 'theme9':
+            colors = theme9;
+            break;
+        case 'theme10':
+            colors = theme10;
             break;
         case 'default':
         default:
