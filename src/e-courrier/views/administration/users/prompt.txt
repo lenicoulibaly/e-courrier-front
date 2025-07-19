@@ -59,6 +59,8 @@ Changer le profil par défaut (CustomAlertDialog)
 
 Revoquer le profil (CustomAlertDialog)
 
+Modifier le profile (Modal) utilise useUpdateUserProfile() pour la mise à jour
+
 Le profile ayant "assStatusCode": "STA_ASS_CUR" est le profile courant. Il doit être de fond vers légé
 Les profiles ayant "assStatusCode": "STA_ASS_INACT" sont les profile revoqués. Il doivent être de fond grisé légé
 
@@ -117,19 +119,38 @@ DTOS :
         "size": 3,
         "numberOfElements": 3
     }
-UserProfileAssDTO:
+
+    UserProfileAssDTO: //pour l'ajout et la modification d'un profile à un utilisateur
+    {
+        "userId": 456,
+        "profileCode": "ADMIN", // Utiliser useAllProfiles() pour l'Autocomplete
+        "strId": 789, //Autocomplete
+        "userProfileAssTypeCode": "TITULAIRE", //Autocomplete
+        "startingDate": "2025-01-01",
+        "endingDate": "2025-12-31",
+    }
+UserProfileAssDTO: //pour la liste des profiles d'un utilisateurs
 {
-  "id": 123,
-  "userId": 456,
-  "email": "user@example.com",
-  "profileCode": "ADMIN", //Afficher
-  "profileName": "Administrateur Système", //Afficher
-  "strId": 789,
-  "strName": "Direction Générale", //Afficher
-  "userProfileAssTypeCode": "TITULAIRE",
-  "userProfileAssTypeName": "Titulaire", //Afficher
-  "startingDate": "2025-01-01", //Afficher
-  "endingDate": "2025-12-31", //Afficher
-  "assStatusCode": "STA_ASS_CUR",
-  "assStatusName": "Profile courant", //Afficher
-}
+      "content": [
+            {
+          "id": 123,
+          "userId": 456,
+          "email": "user@example.com",
+          "profileCode": "ADMIN", //Afficher
+          "profileName": "Administrateur Système", //Afficher
+          "strId": 789,
+          "strName": "Direction Générale", //Afficher
+          "userProfileAssTypeCode": "TITULAIRE",
+          "userProfileAssTypeName": "Titulaire", //Afficher
+          "startingDate": "2025-01-01", //Afficher
+          "endingDate": "2025-12-31", //Afficher
+          "assStatusCode": "STA_ASS_CUR",
+          "assStatusName": "Profile courant", //Afficher
+        }
+            ],
+"totalElements": 24,
+        "totalPages": 8,
+        "page": 3,
+        "size": 3,
+        "numberOfElements": 3
+ }
