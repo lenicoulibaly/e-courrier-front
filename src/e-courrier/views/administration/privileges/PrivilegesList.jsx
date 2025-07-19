@@ -146,6 +146,7 @@ const PrivilegesList = ({ searchTerm, privilegeTypeCodes, onEditPrivilege }) => 
                     onPageChange={handlePageChange}
                     currentSize={pageSize}
                     onSizeChange={handlePageSizeChange}
+                    totalCount={privilegesPage.totalElements}
                 />
             )}
         </>

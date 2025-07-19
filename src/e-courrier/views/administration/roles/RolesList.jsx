@@ -193,6 +193,7 @@ const RolesList = ({ searchTerm, onEditRole }) => {
                     onPageChange={handlePageChange}
                     currentSize={pageSize}
                     onSizeChange={handlePageSizeChange}
+                    totalCount={rolesPage.totalElements}
                 />
             )}
 

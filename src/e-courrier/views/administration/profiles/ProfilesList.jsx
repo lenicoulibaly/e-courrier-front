@@ -153,18 +153,14 @@ const ProfilesList = ({ searchTerm, onEditProfile, onViewProfile }) => {
                 </Table>
             </TableContainer>
             {profilesPage && (
-                <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mt: 2 }}>
-                    <Typography variant="body2">
-                        Total: {profilesPage.totalElements} profil(s)
-                    </Typography>
-                    <Pagination 
-                        totalPages={profilesPage.totalPages} 
-                        currentPage={page} 
-                        onPageChange={handlePageChange}
-                        currentSize={pageSize}
-                        onSizeChange={handlePageSizeChange}
-                    />
-                </Stack>
+                <Pagination 
+                    totalPages={profilesPage.totalPages} 
+                    currentPage={page} 
+                    onPageChange={handlePageChange}
+                    currentSize={pageSize}
+                    onSizeChange={handlePageSizeChange}
+                    totalCount={profilesPage.totalElements}
+                />
             )}
         </>
     );

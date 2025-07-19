@@ -154,3 +154,9 @@ UserProfileAssDTO: //pour la liste des profiles d'un utilisateurs
         "size": 3,
         "numberOfElements": 3
  }
+
+
+ Ajouter un element de menu pour accéder la gestion des utilsateurs et Faire routage
+
+ Les boutons bloquer l'utilisateur, débloquer l'utilisateur et envoyer un lien d'activation doivent afficher la boite de dialogue de confirmation. puis lorsque l'ulisateur confirme,
+ On peut lancer la requete avec useBlockUser, useUnblockUser, useSendActivationEmail

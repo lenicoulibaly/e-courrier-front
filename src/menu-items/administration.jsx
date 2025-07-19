@@ -48,6 +48,13 @@ const administration = {
             type: 'item',
             icon: icons.IconUser,
             url: '/administration/profiles'
+        },
+        {
+            id: 'users',
+            title: <FormattedMessage id="users" />,
+            type: 'item',
+            icon: icons.IconUser,
+            url: '/administration/users'
         }
     ]
 };

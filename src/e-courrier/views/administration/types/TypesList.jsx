@@ -167,6 +167,7 @@ const TypesList = ({ searchTerm, groupCodes, onEditType }) => {
                     onPageChange={handlePageChange}
                     currentSize={pageSize}
                     onSizeChange={handlePageSizeChange}
+                    totalCount={typesPage.totalElements}
                 />
             )}
 

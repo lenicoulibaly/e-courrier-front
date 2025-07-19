@@ -13,6 +13,8 @@ const TypesManagement = Loadable(lazy(() => import('e-courrier/views/administrat
 const PrivilegesManagement = Loadable(lazy(() => import('e-courrier/views/administration/privileges')));
 const RolesManagement = Loadable(lazy(() => import('e-courrier/views/administration/roles')));
 const ProfilesManagement = Loadable(lazy(() => import('e-courrier/views/administration/profiles')));
+const UsersManagement = Loadable(lazy(() => import('e-courrier/views/administration/users')));
+const UserProfiles = Loadable(lazy(() => import('e-courrier/views/administration/users/UserProfiles')));
 
 // dashboard routing
 const DashboardDefault = Loadable(lazy(() => import('views/dashboard/Default')));
@@ -709,6 +711,14 @@ const MainRoutes = {
         {
             path: '/administration/profiles',
             element: <ProfilesManagement />
+        },
+        {
+            path: '/administration/users',
+            element: <UsersManagement />
+        },
+        {
+            path: '/administration/users/:userId/profiles',
+            element: <UserProfiles />
         }
     ]
 };
