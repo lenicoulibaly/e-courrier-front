@@ -122,13 +122,14 @@ UserProfileAssDTO:
   "id": 123,
   "userId": 456,
   "email": "user@example.com",
-  "profileCode": "ADMIN",
-  "profileName": "Administrateur Système",
+  "profileCode": "ADMIN", //Afficher
+  "profileName": "Administrateur Système", //Afficher
   "strId": 789,
-  "strName": "Direction Générale",
+  "strName": "Direction Générale", //Afficher
   "userProfileAssTypeCode": "TITULAIRE",
-  "userProfileAssTypeName": "Titulaire",
-  "startingDate": "2025-01-01",
-  "endingDate": "2025-12-31",
-  "assStatusCode": "STA_ASS_CUR"
+  "userProfileAssTypeName": "Titulaire", //Afficher
+  "startingDate": "2025-01-01", //Afficher
+  "endingDate": "2025-12-31", //Afficher
+  "assStatusCode": "STA_ASS_CUR",
+  "assStatusName": "Profile courant", //Afficher
 }
