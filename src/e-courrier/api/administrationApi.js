@@ -155,7 +155,11 @@ export const profileApi = {
     },
     searchProfilesByUser: async (userId, params = {}) => {
         const queryString = qs.stringify(params, { arrayFormat: 'repeat' });
-        const response = await apiClient.get(`/authorities/profiles/search/by-user/${userId}?${queryString}`);
+        const response = await apiClient.get(`/authorities/user-profiles/search/${userId}?${queryString}`);
+        return response.data;
+    },
+    getAllProfiles: async () => {
+        const response = await apiClient.get('/authorities/profiles/all');
         return response.data;
     },
 

@@ -84,6 +84,13 @@ export const useSearchProfile = (params = {}) => {
     });
 };
 
+export const useAllProfiles = () => {
+    return useQuery({
+        queryKey: [...PROFILES_KEYS.all, 'all'],
+        queryFn: () => profileApi.getAllProfiles(),
+    });
+};
+
 export const useProfilesByUser = (userId, params = {}) => {
     return useQuery({
         queryKey: PROFILES_KEYS.byUser(userId, params),
