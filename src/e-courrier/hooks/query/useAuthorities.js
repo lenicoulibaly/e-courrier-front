@@ -36,6 +36,21 @@ export const useUserAuthorities = (username) => {
     });
 };
 
+export const useUpdateUserProfile = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: (profileData) => authorityApi.updateUserProfile(profileData),
+        onSuccess: (data, variables) => {
+            // Invalidate relevant queries
+            queryClient.invalidateQueries({ queryKey: AUTHORITIES_KEYS.all });
+            if (variables.userId) {
+                queryClient.invalidateQueries({ queryKey: PROFILES_KEYS.byUser(variables.userId) });
+            }
+        },
+    });
+};
+
 // Hooks for roles
 export const useRoles = (params = {}) => {
     return useQuery({

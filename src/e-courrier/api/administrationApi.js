@@ -177,6 +177,12 @@ export const authorityApi = {
         const response = await apiClient.get(`/authorities/${username}`);
         return response.data;
     },
+
+    // Mettre à jour le profil d'un utilisateur
+    updateUserProfile: async (profileData) => {
+        const response = await apiClient.put('/authorities/update-user-profile', profileData);
+        return response.data;
+    },
 };
 
 // API Structures
