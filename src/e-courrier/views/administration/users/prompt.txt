@@ -1,0 +1,134 @@
+Implémenter la gestion des utilisateurs
+
+✅ 1 - Liste des utilisateurs
+Fonctionnalités :
+Afficher une liste paginée des utilisateurs. (utiliser useSearchUsers)
+
+Ajouter au-dessus de la liste :
+
+Un champ de recherche multicritère (nom, email, téléphone, etc.).
+
+Un filtre par structure (Autocomplete). utiliser useVisibleStructures() pour l'Autocomplete
+
+Un bouton "Ajouter" (à l’extrême droite).
+
+Actions disponibles par utilisateur :
+Sous forme d’un bouton déroulant avec les options suivantes, en utilisant les composants communs :
+
+Action	Composant à utiliser
+Voir le détail	src/e-courrier/components/commons/Modal
+Modifier l’utilisateur	src/e-courrier/components/commons/Modal
+Bloquer l’utilisateur	src/e-courrier/components/commons/CustomAlertDialog
+Débloquer l’utilisateur	src/e-courrier/components/commons/CustomAlertDialog
+Envoyer un lien d’activation	src/e-courrier/components/commons/CustomAlertDialog
+Ajouter un profil	src/e-courrier/components/commons/Modal
+Changer le profil par défaut	src/e-courrier/components/commons/CustomAlertDialog
+Afficher la liste des profils de l’utilisateur	Naviguer vers une page dédiée à cette fonctionnalité
+
+✅ 2 - Création d’un utilisateur
+Effectuée dans une modale (Modal commun).
+
+Le formulaire de création doit comporter :
+
+Un bloc pour les informations générales (nom, prénom, email, téléphone, structure, etc.).
+
+Un bloc pour l’ajout du premier profil de l’utilisateur (profil, statut actif/désactivé, par défaut oui/non).
+
+✅ 3 - Modification d’un utilisateur
+Réalisée via une modale de mise à jour.
+
+Afficher les informations préremplies.
+
+Permettre la modification de :
+
+    Informations personnelles. (Sauf email)
+
+    Structure.
+
+✅ 4 - Gestion des profils d’un utilisateur
+Page dédiée : utiliser useProfilesByUser(userId, {key: '', page: 0, size: 10})
+Afficher :
+
+La liste des profils associés à l’utilisateur (avec le profil par défaut mis en évidence).
+
+Bouton pour ajouter un profil (Modal).
+
+Actions disponibles par profil :
+
+Changer le profil par défaut (CustomAlertDialog)
+
+Revoquer le profil (CustomAlertDialog)
+
+Le profile ayant "assStatusCode": "STA_ASS_CUR" est le profile courant. Il doit être de fond vers légé
+Les profiles ayant "assStatusCode": "STA_ASS_INACT" sont les profile revoqués. Il doivent être de fond grisé légé
+
+DTOS :
+    StrDTO
+    {
+            "strId": 1501,
+            "strName": "Direction Générale de la Modernisation Publique",
+            "strSigle": "DGMP",
+            "strTypeName": "Direction Générale",
+            "strTypeCode": "DG",
+            "strTel": null,
+            "strAddress": null,
+            "situationGeo": null,
+            "parentId": 1351,
+            "parentName": "Ministère des Finances et du Budget",
+            "parentSigle": "MFB",
+            "strLevel": 1,
+            "respoId": null,
+            "respoName": null,
+            "respoMatricule": null,
+            "chaineSigles": "MFB/DGMP"
+    }
+
+    UserDTO pour la création:
+    {
+                "email": "mireille.diomande@lenicorp.ci",
+                "firstName": "Mireille",
+                "lastName": "Diomande",
+                "tel": "+2250707070114",
+                "strId": 1501, //Utiliser useVisibleStructure() pour l'autocomplete
+                "profileCode":"" // Utiliser useAllProfiles() pour l'autocomplete
+                "userProfileAssTypeCode": "", //Utiliser useTypesByGroupCode("USR_PRFL_TYPE") pour l'autocomplete
+                "startingDate":"",
+                "endingDate":
+    } utilise useCreateUserWithProfile pour la persitence
+
+    Retour de requete paginée sur les utilisateurs :
+    {
+        "content": [
+            {
+                "userId": 263,
+                "email": "mireille.diomande@lenicorp.ci",
+                "firstName": "Mireille",
+                "lastName": "Diomande",
+                "tel": "+2250707070114",
+                "lastLogin": "2025-06-24T08:47:03",
+                "strId": 1501,
+                "strName": "Direction Générale de la Modernisation Publique",
+                "strSigle": "DGMP",
+            }
+        ],
+        "totalElements": 24,
+        "totalPages": 8,
+        "page": 3,
+        "size": 3,
+        "numberOfElements": 3
+    }
+UserProfileAssDTO:
+{
+  "id": 123,
+  "userId": 456,
+  "email": "user@example.com",
+  "profileCode": "ADMIN",
+  "profileName": "Administrateur Système",
+  "strId": 789,
+  "strName": "Direction Générale",
+  "userProfileAssTypeCode": "TITULAIRE",
+  "userProfileAssTypeName": "Titulaire",
+  "startingDate": "2025-01-01",
+  "endingDate": "2025-12-31",
+  "assStatusCode": "STA_ASS_CUR"
+}
