@@ -2,7 +2,7 @@
 import { FormattedMessage } from 'react-intl';
 
 // assets
-import { IconSettings, IconCategory, IconShield, IconUserCircle, IconUser } from '@tabler/icons-react';
+import { IconSettings, IconCategory, IconShield, IconUserCircle, IconUser, IconUsers } from '@tabler/icons-react';
 
 // constant
 const icons = {
@@ -10,7 +10,8 @@ const icons = {
     IconCategory,
     IconShield,
     IconUserCircle,
-    IconUser
+    IconUser,
+    IconUsers
 };
 
 // ==============================|| ADMINISTRATION MENU ITEMS ||============================== //
@@ -53,7 +54,7 @@ const administration = {
             id: 'users',
             title: <FormattedMessage id="users" />,
             type: 'item',
-            icon: icons.IconUser,
+            icon: icons.IconUsers,
             url: '/administration/users'
         }
     ]

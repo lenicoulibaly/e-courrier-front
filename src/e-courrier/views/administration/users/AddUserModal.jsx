@@ -26,6 +26,7 @@ import { fr } from 'date-fns/locale';
 
 // project imports
 import Modal from '../../../components/commons/Modal';
+import FloatingAlert from '../../../components/commons/FloatingAlert';
 import { useVisibleStructures } from '../../../hooks/query/useStructures';
 import { useAllProfiles } from '../../../hooks/query/useAuthorities';
 import { useTypesByGroupCode } from '../../../hooks/query/useTypes';
@@ -47,6 +48,9 @@ const AddUserModal = ({ open, handleClose }) => {
         endingDate: null
     });
     const [errors, setErrors] = useState({});
+    const [isCreateSuccess, setIsCreateSuccess] = useState(false);
+    const [isCreateError, setIsCreateError] = useState(false);
+    const [createErrorMessage, setCreateErrorMessage] = useState('');
 
     // Fetch data for dropdowns
     const { data: structures, isLoading: isLoadingStructures } = useVisibleStructures();
@@ -127,16 +131,21 @@ const AddUserModal = ({ open, handleClose }) => {
             try {
                 await createUserMutation.mutateAsync(formData);
                 queryClient.invalidateQueries('users');
-                handleClose();
+                setIsCreateSuccess(true);
+                setIsCreateError(false);
             } catch (error) {
                 console.error('Error creating user:', error);
+                setIsCreateError(true);
+                setIsCreateSuccess(false);
                 // Handle API errors
                 if (error.response?.data?.message) {
+                    setCreateErrorMessage(error.response.data.message);
                     setErrors({
                         ...errors,
                         submit: error.response.data.message
                     });
                 } else {
+                    setCreateErrorMessage('Une erreur est survenue lors de la création de l\'utilisateur');
                     setErrors({
                         ...errors,
                         submit: 'Une erreur est survenue lors de la création de l\'utilisateur'
@@ -152,21 +161,8 @@ const AddUserModal = ({ open, handleClose }) => {
             handleClose={handleClose}
             title="Ajouter un nouvel utilisateur"
             maxWidth="md"
-            actions={
-                <Box display="flex" justifyContent="flex-end" gap={1}>
-                    <Button variant="outlined" color="secondary" onClick={handleClose}>
-                        Annuler
-                    </Button>
-                    <Button 
-                        variant="contained" 
-                        color="primary" 
-                        onClick={handleSubmit}
-                        disabled={createUserMutation.isLoading}
-                    >
-                        {createUserMutation.isLoading ? 'Création en cours...' : 'Créer'}
-                    </Button>
-                </Box>
-            }
+            handleConfirmation={handleSubmit}
+            actionDisabled={!!createUserMutation.isLoading}
         >
             <Grid container spacing={2}>
                 {/* General Information Section */}
@@ -353,6 +349,11 @@ const AddUserModal = ({ open, handleClose }) => {
                     </Grid>
                 )}
             </Grid>
+            <FloatingAlert 
+                open={isCreateError || isCreateSuccess} 
+                feedBackMessages={isCreateError ? createErrorMessage : isCreateSuccess ? 'Utilisateur créé avec succès' : ''} 
+                severity={isCreateError ? 'error' : isCreateSuccess ? 'success' : 'info'}
+            />
         </Modal>
     );
 };

@@ -107,7 +107,6 @@ const EditProfileModal = ({ open, handleClose, profile }) => {
                 handleClose();
             },
             onError: (error) => {
-                console.error('Error updating profile:', error.response?.data);
                 setSubmitting(false);
             }
         });

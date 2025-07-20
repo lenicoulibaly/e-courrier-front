@@ -22,6 +22,7 @@ import { fr } from 'date-fns/locale';
 
 // project imports
 import Modal from '../../../components/commons/Modal';
+import FloatingAlert from '../../../components/commons/FloatingAlert';
 import { useVisibleStructures } from '../../../hooks/query/useStructures';
 import { useAllProfiles } from '../../../hooks/query/useAuthorities';
 import { useTypesByGroupCode } from '../../../hooks/query/useTypes';
@@ -41,6 +42,9 @@ const EditUserProfileModal = ({ open, handleClose, profile }) => {
         endingDate: null
     });
     const [errors, setErrors] = useState({});
+    const [isUpdateSuccess, setIsUpdateSuccess] = useState(false);
+    const [isUpdateError, setIsUpdateError] = useState(false);
+    const [updateErrorMessage, setUpdateErrorMessage] = useState('');
 
     // Fetch data for dropdowns
     const { data: structures, isLoading: isLoadingStructures } = useVisibleStructures();
@@ -122,16 +126,24 @@ const EditUserProfileModal = ({ open, handleClose, profile }) => {
             try {
                 await updateProfileMutation.mutateAsync(formData);
                 queryClient.invalidateQueries(['userProfiles', formData.userId]);
-                handleClose();
+                setIsUpdateSuccess(true);
+                setIsUpdateError(false);
+                setTimeout(() => {
+                    handleClose();
+                }, 2000); // Close the modal after 2 seconds to allow the user to see the success message
             } catch (error) {
                 console.error('Error updating profile:', error);
+                setIsUpdateError(true);
+                setIsUpdateSuccess(false);
                 // Handle API errors
                 if (error.response?.data?.message) {
+                    setUpdateErrorMessage(error.response.data.message);
                     setErrors({
                         ...errors,
                         submit: error.response.data.message
                     });
                 } else {
+                    setUpdateErrorMessage('Une erreur est survenue lors de la mise à jour du profil');
                     setErrors({
                         ...errors,
                         submit: 'Une erreur est survenue lors de la mise à jour du profil'
@@ -271,6 +283,11 @@ const EditUserProfileModal = ({ open, handleClose, profile }) => {
                     </Grid>
                 )}
             </Grid>
+            <FloatingAlert 
+                open={isUpdateError || isUpdateSuccess} 
+                feedBackMessages={isUpdateError ? updateErrorMessage : isUpdateSuccess ? 'Profil modifié avec succès' : ''} 
+                severity={isUpdateError ? 'error' : isUpdateSuccess ? 'success' : 'info'}
+            />
         </Modal>
     );
 };

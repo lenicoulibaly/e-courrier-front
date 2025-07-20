@@ -20,7 +20,7 @@ const ViewUserModal = ({ open, handleClose, user }) => {
     if (!user) return null;
 
     return (
-        <Modal
+        <Modal actionVisible={false}
             open={open}
             handleClose={handleClose}
             title="Détails de l'utilisateur"

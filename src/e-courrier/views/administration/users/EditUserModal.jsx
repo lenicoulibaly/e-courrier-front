@@ -19,6 +19,7 @@ import {
 
 // project imports
 import Modal from '../../../components/commons/Modal';
+import FloatingAlert from '../../../components/commons/FloatingAlert';
 import { useVisibleStructures } from '../../../hooks/query/useStructures';
 import { useUpdateUser } from '../../../hooks/query/useUsers';
 
@@ -35,6 +36,9 @@ const EditUserModal = ({ open, handleClose, user }) => {
         strId: null
     });
     const [errors, setErrors] = useState({});
+    const [isUpdateSuccess, setIsUpdateSuccess] = useState(false);
+    const [isUpdateError, setIsUpdateError] = useState(false);
+    const [updateErrorMessage, setUpdateErrorMessage] = useState('');
 
     // Fetch structures for dropdown
     const { data: structures, isLoading: isLoadingStructures } = useVisibleStructures();
@@ -109,16 +113,21 @@ const EditUserModal = ({ open, handleClose, user }) => {
             try {
                 await updateUserMutation.mutateAsync(formData);
                 queryClient.invalidateQueries('users');
-                handleClose();
+                setIsUpdateSuccess(true);
+                setIsUpdateError(false);
             } catch (error) {
                 console.error('Error updating user:', error);
+                setIsUpdateError(true);
+                setIsUpdateSuccess(false);
                 // Handle API errors
                 if (error.response?.data?.message) {
+                    setUpdateErrorMessage(error.response.data.message);
                     setErrors({
                         ...errors,
                         submit: error.response.data.message
                     });
                 } else {
+                    setUpdateErrorMessage('Une erreur est survenue lors de la mise à jour de l\'utilisateur');
                     setErrors({
                         ...errors,
                         submit: 'Une erreur est survenue lors de la mise à jour de l\'utilisateur'
@@ -134,21 +143,8 @@ const EditUserModal = ({ open, handleClose, user }) => {
             handleClose={handleClose}
             title="Modifier l'utilisateur"
             maxWidth="md"
-            actions={
-                <Box display="flex" justifyContent="flex-end" gap={1}>
-                    <Button variant="outlined" color="secondary" onClick={handleClose}>
-                        Annuler
-                    </Button>
-                    <Button 
-                        variant="contained" 
-                        color="primary" 
-                        onClick={handleSubmit}
-                        disabled={updateUserMutation.isLoading}
-                    >
-                        {updateUserMutation.isLoading ? 'Mise à jour en cours...' : 'Mettre à jour'}
-                    </Button>
-                </Box>
-            }
+            actionDisabled={!!updateUserMutation.isLoading}
+            handleConfirmation={handleSubmit}
         >
             <Grid container spacing={2}>
                 {/* General Information Section */}
@@ -249,6 +245,11 @@ const EditUserModal = ({ open, handleClose, user }) => {
                     </Grid>
                 )}
             </Grid>
+            <FloatingAlert 
+                open={isUpdateError || isUpdateSuccess} 
+                feedBackMessages={isUpdateError ? updateErrorMessage : isUpdateSuccess ? 'Utilisateur modifié avec succès' : ''} 
+                severity={isUpdateError ? 'error' : isUpdateSuccess ? 'success' : 'info'}
+            />
         </Modal>
     );
 };

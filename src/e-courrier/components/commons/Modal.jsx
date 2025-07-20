@@ -55,13 +55,7 @@ const Modal = ({ open, printVisible=false, newVisible=false,
                    children, actionVisible =true, actionDisabled, actionLabel, width,
                    titleBgColor, printButtonColor, zIndex = 1300}) => {
     return (
-        <StyledDialog
-            aria-labelledby="customized-dialog-title"
-            open={open}
-            maxWidth={width || 'sm'}
-            fullWidth
-            bgcolor={titleBgColor}
-        >
+        <StyledDialog aria-labelledby="customized-dialog-title" open={open} maxWidth={width || 'sm'} fullWidth bgcolor={titleBgColor}>
             <StyledDialogTitle bgcolor={titleBgColor}>
                 <small>{decodeURIComponent(encodeURIComponent(title))}</small>
                 {handleClose && (
@@ -77,26 +71,33 @@ const Modal = ({ open, printVisible=false, newVisible=false,
                     </Grid>
                 </Grid>
             </DialogContent>
-            <DialogActions>
-                <Box sx={{ display: "flex", justifyContent: "flex-start", width: "100%" }}>
-                    {printVisible && <Tooltip placement="top" title="Imprimer">
-                        <IconButton color={printButtonColor} aria-label="Print" size="large" onClick={handlePrint}>
-                            <PrintIcon sx={{ fontSize: '2rem' }} />
-                        </IconButton>
-                    </Tooltip>}
-                    {newVisible && <Tooltip placement="top" title="Nouveau">
-                        <IconButton aria-label="New" size="large" onClick={handleNew}>
-                            <AddBoxIcon sx={{ fontSize: '2rem' }} />
-                        </IconButton>
-                    </Tooltip>}
-                </Box>
-                <CustomAlertDialog actionVisible={actionVisible}
-                             actionDisabled={actionDisabled}
-                             openLabel={actionLabel || 'Enregistrer'}
-                             handleConfirmation={handleConfirmation}
-                             TriggerIcon={<SaveIcon sx={{ fontSize: '2rem' }} />}
-                />
-            </DialogActions>
+            {actionVisible &&
+                <DialogActions>
+                    <Box sx={{ display: 'flex', justifyContent: 'flex-start', width: '100%' }}>
+                        {printVisible && (
+                            <Tooltip placement="top" title="Imprimer">
+                                <IconButton color={printButtonColor} aria-label="Print" size="large" onClick={handlePrint}>
+                                    <PrintIcon sx={{ fontSize: '2rem' }} />
+                                </IconButton>
+                            </Tooltip>
+                        )}
+                        {newVisible && (
+                            <Tooltip placement="top" title="Nouveau">
+                                <IconButton aria-label="New" size="large" onClick={handleNew}>
+                                    <AddBoxIcon sx={{ fontSize: '2rem' }} />
+                                </IconButton>
+                            </Tooltip>
+                        )}
+                    </Box>
+                    <CustomAlertDialog
+                        actionVisible={actionVisible}
+                        actionDisabled={actionDisabled}
+                        openLabel={actionLabel || 'Enregistrer'}
+                        handleConfirmation={handleConfirmation}
+                        TriggerIcon={<SaveIcon sx={{ fontSize: '2rem' }} />}
+                    />
+                </DialogActions>
+            }
         </StyledDialog>
     );
 };

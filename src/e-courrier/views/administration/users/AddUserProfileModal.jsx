@@ -22,6 +22,7 @@ import { fr } from 'date-fns/locale';
 
 // project imports
 import Modal from '../../../components/commons/Modal';
+import FloatingAlert from '../../../components/commons/FloatingAlert';
 import { useVisibleStructures } from '../../../hooks/query/useStructures';
 import { useAllProfiles } from '../../../hooks/query/useAuthorities';
 import { useTypesByGroupCode } from '../../../hooks/query/useTypes';
@@ -40,6 +41,9 @@ const AddUserProfileModal = ({ open, handleClose, userId }) => {
         endingDate: null
     });
     const [errors, setErrors] = useState({});
+    const [isCreateSuccess, setIsCreateSuccess] = useState(false);
+    const [isCreateError, setIsCreateError] = useState(false);
+    const [createErrorMessage, setCreateErrorMessage] = useState('');
 
     // Fetch data for dropdowns
     const { data: structures, isLoading: isLoadingStructures } = useVisibleStructures();
@@ -106,16 +110,20 @@ const AddUserProfileModal = ({ open, handleClose, userId }) => {
             try {
                 await addProfileMutation.mutateAsync(formData);
                 queryClient.invalidateQueries(['userProfiles', userId]);
-                handleClose();
+                setIsCreateSuccess(true);
+                setIsCreateError(false);
             } catch (error) {
-                console.error('Error adding profile:', error);
+                setIsCreateError(true);
+                setIsCreateSuccess(false);
                 // Handle API errors
-                if (error.response?.data?.message) {
+                if (error.response?.data) {
+                    setCreateErrorMessage(error.response.data);
                     setErrors({
                         ...errors,
-                        submit: error.response.data.message
+                        submit: error.response.data
                     });
                 } else {
+                    setCreateErrorMessage('Une erreur est survenue lors de l\'ajout du profil');
                     setErrors({
                         ...errors,
                         submit: 'Une erreur est survenue lors de l\'ajout du profil'
@@ -131,21 +139,8 @@ const AddUserProfileModal = ({ open, handleClose, userId }) => {
             handleClose={handleClose}
             title="Ajouter un profil"
             maxWidth="md"
-            actions={
-                <Box display="flex" justifyContent="flex-end" gap={1}>
-                    <Button variant="outlined" color="secondary" onClick={handleClose}>
-                        Annuler
-                    </Button>
-                    <Button 
-                        variant="contained" 
-                        color="primary" 
-                        onClick={handleSubmit}
-                        disabled={addProfileMutation.isLoading}
-                    >
-                        {addProfileMutation.isLoading ? 'Ajout en cours...' : 'Ajouter'}
-                    </Button>
-                </Box>
-            }
+            handleConfirmation={handleSubmit}
+            actionDisabled={!!addProfileMutation.isLoading}
         >
             <Grid container spacing={2}>
                 <Grid item xs={12} md={6}>
@@ -255,6 +250,11 @@ const AddUserProfileModal = ({ open, handleClose, userId }) => {
                     </Grid>
                 )}
             </Grid>
+            <FloatingAlert 
+                open={isCreateError || isCreateSuccess} 
+                feedBackMessages={isCreateError ? createErrorMessage : isCreateSuccess ? 'Profil ajouté avec succès' : ''} 
+                severity={isCreateError ? 'error' : isCreateSuccess ? 'success' : 'info'}
+            />
         </Modal>
     );
 };
