@@ -43,7 +43,7 @@ import AddUserProfileModal from './AddUserProfileModal';
 
 // ==============================|| USERS LIST ||============================== //
 
-const UsersList = ({ searchTerm, structureId, onEditUser, onViewUser, onViewUserProfiles }) => {
+const UsersList = ({ searchTerm, structureId, userId, onEditUser, onViewUser, onViewUserProfiles }) => {
     const theme = useTheme();
     const [filteredUsers, setFilteredUsers] = useState([]);
     const [page, setPage] = useState(0);
@@ -54,7 +54,6 @@ const UsersList = ({ searchTerm, structureId, onEditUser, onViewUser, onViewUser
     const [openBlockDialog, setOpenBlockDialog] = useState(false);
     const [openUnblockDialog, setOpenUnblockDialog] = useState(false);
     const [openActivationDialog, setOpenActivationDialog] = useState(false);
-    const [openDefaultProfileDialog, setOpenDefaultProfileDialog] = useState(false);
 
     // State for alerts
     const [alertOpen, setAlertOpen] = useState(false);
@@ -66,7 +65,8 @@ const UsersList = ({ searchTerm, structureId, onEditUser, onViewUser, onViewUser
         page: page, 
         size: pageSize, 
         key: searchTerm,
-        strId: structureId
+        strId: structureId,
+        userId: userId
     });
     const users = usersPage?.content;
 
@@ -134,17 +134,12 @@ const UsersList = ({ searchTerm, structureId, onEditUser, onViewUser, onViewUser
         setOpenAddProfileModal(true);
     };
 
-    // Handle set default profile
-    const handleSetDefaultProfile = () => {
-        handleMenuClose();
-        setOpenDefaultProfileDialog(true);
-    };
 
     // Handle view profiles
     const handleViewProfiles = () => {
         handleMenuClose();
         if (onViewUserProfiles && selectedUser) {
-            onViewUserProfiles(selectedUser.userId);
+            onViewUserProfiles(selectedUser.userId, selectedUser);
         }
     };
 
@@ -176,9 +171,6 @@ const UsersList = ({ searchTerm, structureId, onEditUser, onViewUser, onViewUser
         setOpenActivationDialog(false);
     };
 
-    const handleCloseDefaultProfileDialog = () => {
-        setOpenDefaultProfileDialog(false);
-    };
 
     // Handle confirm actions
     const handleConfirmBlock = () => {
@@ -241,10 +233,6 @@ const UsersList = ({ searchTerm, structureId, onEditUser, onViewUser, onViewUser
         }
     };
 
-    const handleConfirmDefaultProfile = () => {
-        // Implement set default profile logic here
-        setOpenDefaultProfileDialog(false);
-    };
 
     // Show loading state
     if (isLoading) {
@@ -380,10 +368,6 @@ const UsersList = ({ searchTerm, structureId, onEditUser, onViewUser, onViewUser
                     <PersonAddIcon fontSize="small" sx={{ mr: 1 }} />
                     Ajouter un profil
                 </MenuItem>
-                <MenuItem onClick={handleSetDefaultProfile}>
-                    <StarIcon fontSize="small" sx={{ mr: 1 }} />
-                    Changer le profil par défaut
-                </MenuItem>
                 <MenuItem onClick={handleViewProfiles}>
                     <ListIcon fontSize="small" sx={{ mr: 1 }} />
                     Afficher la liste des profils
@@ -396,6 +380,7 @@ const UsersList = ({ searchTerm, structureId, onEditUser, onViewUser, onViewUser
                     open={openAddProfileModal}
                     handleClose={handleCloseAddProfileModal}
                     userId={selectedUser.userId}
+                    user={selectedUser}
                 />
             )}
 
@@ -432,16 +417,6 @@ const UsersList = ({ searchTerm, structureId, onEditUser, onViewUser, onViewUser
                 handleConfirm={handleConfirmActivation}
             />
 
-            {/* Set Default Profile Dialog */}
-            <CustomAlertDialog
-                open={openDefaultProfileDialog}
-                handleClose={handleCloseDefaultProfileDialog}
-                title="Changer le profil par défaut"
-                content={`Êtes-vous sûr de vouloir changer le profil par défaut de ${selectedUser?.firstName} ${selectedUser?.lastName} ?`}
-                confirmBtnText="Changer"
-                cancelBtnText="Annuler"
-                handleConfirm={handleConfirmDefaultProfile}
-            />
 
             {/* Floating Alert for success/error messages */}
             <FloatingAlert
@@ -456,6 +431,7 @@ const UsersList = ({ searchTerm, structureId, onEditUser, onViewUser, onViewUser
 UsersList.propTypes = {
     searchTerm: PropTypes.string,
     structureId: PropTypes.number,
+    userId: PropTypes.number,
     onEditUser: PropTypes.func,
     onViewUser: PropTypes.func,
     onViewUserProfiles: PropTypes.func

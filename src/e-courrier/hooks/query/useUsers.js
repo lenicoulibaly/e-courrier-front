@@ -18,6 +18,18 @@ export const useSearchUsers = (params = {}) => {
     });
 };
 
+// Hook for fetching visible users (for autocomplete)
+export const useVisibleUsers = () => {
+    return useQuery({
+        queryKey: [...USERS_KEYS.lists(), 'visible'],
+        queryFn: () => userApi.getVisibleUsers(),
+    });
+};
+
+// Hook for fetching a single user by ID has been removed
+// It was erroneous and didn't correspond to anything on the backend
+// User information is now obtained from the list instead
+
 // Hooks for mutations
 export const useCreateUser = () => {
     const queryClient = useQueryClient();

@@ -719,6 +719,10 @@ const MainRoutes = {
         {
             path: '/administration/users/:userId/profiles',
             element: <UserProfiles />
+        },
+        {
+            path: '/administration/user-profiles',
+            element: <UserProfiles />
         }
     ]
 };

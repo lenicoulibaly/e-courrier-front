@@ -120,11 +120,14 @@ const EditUserModal = ({ open, handleClose, user }) => {
                 setIsUpdateError(true);
                 setIsUpdateSuccess(false);
                 // Handle API errors
-                if (error.response?.data?.message) {
-                    setUpdateErrorMessage(error.response.data.message);
+                if (error.response?.data) {
+                    const errorMessage = typeof error.response.data === 'object' 
+                        ? error.response.data.message || JSON.stringify(error.response.data) 
+                        : error.response.data;
+                    setUpdateErrorMessage(errorMessage);
                     setErrors({
                         ...errors,
-                        submit: error.response.data.message
+                        submit: errorMessage
                     });
                 } else {
                     setUpdateErrorMessage('Une erreur est survenue lors de la mise à jour de l\'utilisateur');

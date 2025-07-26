@@ -10,6 +10,12 @@ export const userApi = {
         return response.data;
     },
 
+    // Liste des utilisateurs visibles
+    getVisibleUsers: async () => {
+        const response = await apiClient.get('/users/list/visible');
+        return response.data;
+    },
+
     // CRUD Utilisateurs
     createUser: async (userData) => {
         const response = await apiClient.post('/users/create', userData);
@@ -153,9 +159,9 @@ export const profileApi = {
         const response = await apiClient.get(`/authorities/profiles/search?${queryString}`);
         return response.data;
     },
-    searchProfilesByUser: async (userId, params = {}) => {
+    searchProfilesByUser: async (params = {}) => {
         const queryString = qs.stringify(params, { arrayFormat: 'repeat' });
-        const response = await apiClient.get(`/authorities/user-profiles/search/${userId}?${queryString}`);
+        const response = await apiClient.get(`/authorities/user-profiles/search?${queryString}`);
         return response.data;
     },
     getAllProfiles: async () => {
@@ -181,6 +187,18 @@ export const authorityApi = {
     // Mettre à jour le profil d'un utilisateur
     updateUserProfile: async (profileData) => {
         const response = await apiClient.put('/authorities/update-user-profile', profileData);
+        return response.data;
+    },
+
+    // Révoquer l'assignation d'un profil
+    revokeProfileAssignment: async (id) => {
+        const response = await apiClient.put(`/authorities/revoke-profile-assignment/${id}`);
+        return response.data;
+    },
+
+    // Changer le profil par défaut
+    changeDefaultProfile: async (id) => {
+        const response = await apiClient.put(`/authorities/change-default-profile/${id}`);
         return response.data;
     },
 };

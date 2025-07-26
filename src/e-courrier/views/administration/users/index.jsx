@@ -22,6 +22,7 @@ import AddUserModal from './AddUserModal';
 import EditUserModal from './EditUserModal';
 import ViewUserModal from './ViewUserModal';
 import { useVisibleStructures } from '../../../hooks/query/useStructures';
+import { useVisibleUsers } from '../../../hooks/query/useUsers';
 
 // assets
 import { IconSearch } from '@tabler/icons-react';
@@ -33,6 +34,7 @@ import { useTheme } from '@mui/material/styles';
 const UsersManagement = () => {
     const [, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
+    const [selectedUserFilter, setSelectedUserFilter] = useState(null);
     const [selectedStructure, setSelectedStructure] = useState(null);
     const [openAddModal, setOpenAddModal] = useState(false);
     const [openEditModal, setOpenEditModal] = useState(false);
@@ -43,12 +45,24 @@ const UsersManagement = () => {
     // Fetch structures for the filter
     const { data: structures, isLoading: isLoadingStructures } = useVisibleStructures();
 
+    // Fetch visible users for the autocomplete
+    const { data: visibleUsers, isLoading: isLoadingUsers } = useVisibleUsers();
+
     useEffect(() => {
         setLoading(false);
     }, []);
 
     const handleSearch = (event) => {
         setSearchTerm(event.target.value);
+        setSelectedUserFilter(null); // Reset user filter when typing in search
+    };
+
+    const handleUserFilterChange = (event, newValue) => {
+        setSelectedUserFilter(newValue);
+        // If a user is selected, clear the search term
+        if (newValue) {
+            setSearchTerm('');
+        }
     };
 
     const handleStructureChange = (event, newValue) => {
@@ -69,8 +83,8 @@ const UsersManagement = () => {
         setOpenViewModal(true);
     };
 
-    const handleViewUserProfiles = (userId) => {
-        navigate(`/administration/users/${userId}/profiles`);
+    const handleViewUserProfiles = (userId, user) => {
+        navigate(`/administration/users/${userId}/profiles`, { state: { user } });
     };
 
     const handleCloseAddModal = () => {
@@ -95,21 +109,57 @@ const UsersManagement = () => {
                 <Grid item xs={12}>
                     <Grid container spacing={2} alignItems="center">
                         <Grid item xs={12} sm={6} md={4}>
-                            <FormControl fullWidth>
-                                <InputLabel htmlFor="search-users">Recherche</InputLabel>
-                                <OutlinedInput size={'small'}
-                                    id="search-users"
-                                    value={searchTerm}
-                                    onChange={handleSearch}
-                                    placeholder="Rechercher des utilisateurs..."
-                                    startAdornment={
-                                        <InputAdornment position="start">
-                                            <IconSearch stroke={1.5} size="1rem" />
-                                        </InputAdornment>
-                                    }
-                                    label="Recherche"
+                            {selectedUserFilter ? (
+                                <Autocomplete
+                                    id="user-filter"
+                                    options={visibleUsers || []}
+                                    getOptionLabel={(option) => `${option.firstName} ${option.lastName}`}
+                                    value={selectedUserFilter}
+                                    onChange={handleUserFilterChange}
+                                    renderInput={(params) => (
+                                        <TextField
+                                            {...params}
+                                            label="Filtrer par utilisateur"
+                                            size="small"
+                                            placeholder="Sélectionner un utilisateur"
+                                            InputProps={{
+                                                ...params.InputProps,
+                                                startAdornment: (
+                                                    <>
+                                                        <InputAdornment position="start">
+                                                            <IconSearch stroke={1.5} size="1rem" />
+                                                        </InputAdornment>
+                                                        {params.InputProps.startAdornment}
+                                                    </>
+                                                )
+                                            }}
+                                        />
+                                    )}
+                                    isOptionEqualToValue={(option, value) => option.userId === value?.userId}
                                 />
-                            </FormControl>
+                            ) : (
+                                <FormControl fullWidth>
+                                    <InputLabel htmlFor="search-users">Recherche</InputLabel>
+                                    <OutlinedInput size={'small'}
+                                        id="search-users"
+                                        value={searchTerm}
+                                        onChange={handleSearch}
+                                        placeholder="Rechercher des utilisateurs..."
+                                        startAdornment={
+                                            <InputAdornment position="start">
+                                                <IconSearch stroke={1.5} size="1rem" />
+                                            </InputAdornment>
+                                        }
+                                        label="Recherche"
+                                        onFocus={() => {
+                                            if (visibleUsers && visibleUsers.length > 0) {
+                                                setSelectedUserFilter(null);
+                                                setSearchTerm('');
+                                            }
+                                        }}
+                                    />
+                                </FormControl>
+                            )}
                         </Grid>
                         <Grid item xs={12} sm={6} md={4}>
                             <Autocomplete
@@ -144,8 +194,9 @@ const UsersManagement = () => {
                 </Grid>
                 <Grid item xs={12}>
                     <UsersList 
-                        searchTerm={searchTerm}
+                        searchTerm={selectedUserFilter ? '' : searchTerm}
                         structureId={selectedStructure?.strId}
+                        userId={selectedUserFilter?.userId}
                         onEditUser={handleEditUser}
                         onViewUser={handleViewUser}
                         onViewUserProfiles={handleViewUserProfiles}

@@ -30,7 +30,7 @@ import { useAddProfileToUser } from '../../../hooks/query/useAuthorities';
 
 // ==============================|| ADD USER PROFILE MODAL ||============================== //
 
-const AddUserProfileModal = ({ open, handleClose, userId }) => {
+const AddUserProfileModal = ({ open, handleClose, userId, user: propUser }) => {
     const queryClient = useQueryClient();
     const [formData, setFormData] = useState({
         userId: userId,
@@ -44,6 +44,9 @@ const AddUserProfileModal = ({ open, handleClose, userId }) => {
     const [isCreateSuccess, setIsCreateSuccess] = useState(false);
     const [isCreateError, setIsCreateError] = useState(false);
     const [createErrorMessage, setCreateErrorMessage] = useState('');
+
+    // Use user from props if available
+    const [user] = useState(propUser);
 
     // Fetch data for dropdowns
     const { data: structures, isLoading: isLoadingStructures } = useVisibleStructures();
@@ -117,10 +120,13 @@ const AddUserProfileModal = ({ open, handleClose, userId }) => {
                 setIsCreateSuccess(false);
                 // Handle API errors
                 if (error.response?.data) {
-                    setCreateErrorMessage(error.response.data);
+                    const errorMessage = typeof error.response.data === 'object' 
+                        ? error.response.data.message || JSON.stringify(error.response.data) 
+                        : error.response.data;
+                    setCreateErrorMessage(errorMessage);
                     setErrors({
                         ...errors,
-                        submit: error.response.data
+                        submit: errorMessage
                     });
                 } else {
                     setCreateErrorMessage('Une erreur est survenue lors de l\'ajout du profil');
@@ -137,7 +143,7 @@ const AddUserProfileModal = ({ open, handleClose, userId }) => {
         <Modal
             open={open}
             handleClose={handleClose}
-            title="Ajouter un profil"
+            title={user ? `Ajouter un profil pour ${user.lastName}, ${user.firstName} (${user.email})` : "Ajouter un profil"}
             maxWidth="md"
             handleConfirmation={handleSubmit}
             actionDisabled={!!addProfileMutation.isLoading}
@@ -218,14 +224,13 @@ const AddUserProfileModal = ({ open, handleClose, userId }) => {
                             label="Date de début"
                             value={formData.startingDate}
                             onChange={handleStartDateChange}
-                            renderInput={(params) => (
-                                <TextField
-                                    {...params}
-                                    fullWidth
-                                    error={Boolean(errors.startingDate)}
-                                    helperText={errors.startingDate}
-                                />
-                            )}
+                            slotProps={{
+                                textField: {
+                                    fullWidth: true,
+                                    error: Boolean(errors.startingDate),
+                                    helperText: errors.startingDate
+                                }
+                            }}
                         />
                     </LocalizationProvider>
                 </Grid>
@@ -236,9 +241,11 @@ const AddUserProfileModal = ({ open, handleClose, userId }) => {
                             label="Date de fin (optionnelle)"
                             value={formData.endingDate}
                             onChange={handleEndDateChange}
-                            renderInput={(params) => (
-                                <TextField {...params} fullWidth />
-                            )}
+                            slotProps={{
+                                textField: {
+                                    fullWidth: true
+                                }
+                            }}
                         />
                     </LocalizationProvider>
                 </Grid>
@@ -262,7 +269,8 @@ const AddUserProfileModal = ({ open, handleClose, userId }) => {
 AddUserProfileModal.propTypes = {
     open: PropTypes.bool.isRequired,
     handleClose: PropTypes.func.isRequired,
-    userId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired
+    userId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    user: PropTypes.object
 };
 
 export default AddUserProfileModal;

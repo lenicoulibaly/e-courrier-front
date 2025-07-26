@@ -136,11 +136,14 @@ const EditUserProfileModal = ({ open, handleClose, profile }) => {
                 setIsUpdateError(true);
                 setIsUpdateSuccess(false);
                 // Handle API errors
-                if (error.response?.data?.message) {
-                    setUpdateErrorMessage(error.response.data.message);
+                if (error.response?.data) {
+                    const errorMessage = typeof error.response.data === 'object' 
+                        ? error.response.data.message || JSON.stringify(error.response.data) 
+                        : error.response.data;
+                    setUpdateErrorMessage(errorMessage);
                     setErrors({
                         ...errors,
-                        submit: error.response.data.message
+                        submit: errorMessage
                     });
                 } else {
                     setUpdateErrorMessage('Une erreur est survenue lors de la mise à jour du profil');
@@ -157,7 +160,7 @@ const EditUserProfileModal = ({ open, handleClose, profile }) => {
         <Modal
             open={open}
             handleClose={handleClose}
-            title="Modifier le profil"
+            title={`Modifier le profil de ${profile.lastName}, ${profile.firstName} (${profile.email})`}
             maxWidth="md"
             actions={
                 <Box display="flex" justifyContent="flex-end" gap={1}>
@@ -251,14 +254,13 @@ const EditUserProfileModal = ({ open, handleClose, profile }) => {
                             label="Date de début"
                             value={formData.startingDate}
                             onChange={handleStartDateChange}
-                            renderInput={(params) => (
-                                <TextField
-                                    {...params}
-                                    fullWidth
-                                    error={Boolean(errors.startingDate)}
-                                    helperText={errors.startingDate}
-                                />
-                            )}
+                            slotProps={{
+                                textField: {
+                                    fullWidth: true,
+                                    error: Boolean(errors.startingDate),
+                                    helperText: errors.startingDate
+                                }
+                            }}
                         />
                     </LocalizationProvider>
                 </Grid>
@@ -269,9 +271,11 @@ const EditUserProfileModal = ({ open, handleClose, profile }) => {
                             label="Date de fin (optionnelle)"
                             value={formData.endingDate}
                             onChange={handleEndDateChange}
-                            renderInput={(params) => (
-                                <TextField {...params} fullWidth />
-                            )}
+                            slotProps={{
+                                textField: {
+                                    fullWidth: true
+                                }
+                            }}
                         />
                     </LocalizationProvider>
                 </Grid>

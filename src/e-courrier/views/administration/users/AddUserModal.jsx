@@ -134,15 +134,17 @@ const AddUserModal = ({ open, handleClose }) => {
                 setIsCreateSuccess(true);
                 setIsCreateError(false);
             } catch (error) {
-                console.error('Error creating user:', error);
                 setIsCreateError(true);
                 setIsCreateSuccess(false);
                 // Handle API errors
-                if (error.response?.data?.message) {
-                    setCreateErrorMessage(error.response.data.message);
+                if (error.response?.data) {
+                    const errorMessage = typeof error.response.data === 'object' 
+                        ? error.response.data.message || JSON.stringify(error.response.data) 
+                        : error.response.data;
+                    setCreateErrorMessage(errorMessage);
                     setErrors({
                         ...errors,
-                        submit: error.response.data.message
+                        submit: errorMessage
                     });
                 } else {
                     setCreateErrorMessage('Une erreur est survenue lors de la création de l\'utilisateur');
@@ -317,14 +319,13 @@ const AddUserModal = ({ open, handleClose }) => {
                             label="Date de début"
                             value={formData.startingDate}
                             onChange={handleStartDateChange}
-                            renderInput={(params) => (
-                                <TextField
-                                    {...params}
-                                    fullWidth
-                                    error={Boolean(errors.startingDate)}
-                                    helperText={errors.startingDate}
-                                />
-                            )}
+                            slotProps={{
+                                textField: {
+                                    fullWidth: true,
+                                    error: Boolean(errors.startingDate),
+                                    helperText: errors.startingDate
+                                }
+                            }}
                         />
                     </LocalizationProvider>
                 </Grid>
@@ -335,9 +336,11 @@ const AddUserModal = ({ open, handleClose }) => {
                             label="Date de fin (optionnelle)"
                             value={formData.endingDate}
                             onChange={handleEndDateChange}
-                            renderInput={(params) => (
-                                <TextField {...params} fullWidth />
-                            )}
+                            slotProps={{
+                                textField: {
+                                    fullWidth: true
+                                }
+                            }}
                         />
                     </LocalizationProvider>
                 </Grid>

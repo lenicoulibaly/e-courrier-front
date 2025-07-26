@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect, useRef } from 'react';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 
 // material-ui
 import {
@@ -17,14 +17,23 @@ import {
     TableRow,
     Typography,
     CircularProgress,
-    Box
+    Box,
+    Tooltip,
+    TextField,
+    Autocomplete,
+    FormControl,
+    InputLabel,
+    OutlinedInput,
+    InputAdornment
 } from '@mui/material';
-import { useTheme } from '@mui/material/styles';
+import { useTheme, alpha } from '@mui/material/styles';
 
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
 import { gridSpacing } from 'store/constant';
-import { useProfilesByUser } from '../../../hooks/query/useAuthorities';
+import { useProfilesByUser, useRevokeProfileAssignment, useChangeDefaultProfile } from '../../../hooks/query/useAuthorities';
+import { useSearchUsers } from '../../../hooks/query/useUsers';
+import { useVisibleStructures } from '../../../hooks/query/useStructures';
 import Pagination from '../../../components/commons/Pagination';
 import CustomAlertDialog from '../../../components/commons/CustomAlertDialog';
 import AddUserProfileModal from './AddUserProfileModal';
@@ -37,29 +46,93 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import StarIcon from '@mui/icons-material/Star';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
 import AddIcon from '@mui/icons-material/Add';
+import { IconSearch } from '@tabler/icons-react';
 
 // ==============================|| USER PROFILES ||============================== //
 
 const UserProfiles = () => {
     const { userId } = useParams();
     const navigate = useNavigate();
+    const location = useLocation();
     const theme = useTheme();
-    
+
+    // Get user from location state if available
+    const userFromState = location.state?.user;
+
     const [page, setPage] = useState(0);
     const [pageSize, setPageSize] = useState(10);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [inputValue, setInputValue] = useState('');
+    const searchTimeoutRef = useRef(null);
+    const [selectedUser, setSelectedUser] = useState(null);
+    const [selectedStructure, setSelectedStructure] = useState(null);
     const [openAddModal, setOpenAddModal] = useState(false);
     const [openEditModal, setOpenEditModal] = useState(false);
     const [openRevokeDialog, setOpenRevokeDialog] = useState(false);
     const [openDefaultDialog, setOpenDefaultDialog] = useState(false);
     const [selectedProfile, setSelectedProfile] = useState(null);
 
-    // Fetch user profiles
-    const { data: profilesPage, isLoading, isError, error } = useProfilesByUser(userId, {
+    // Mutations for profile actions
+    const revokeProfileMutation = useRevokeProfileAssignment();
+    const changeDefaultProfileMutation = useChangeDefaultProfile();
+
+    // Fetch users for autocomplete
+    const { data: usersData } = useSearchUsers({
+        page: 0,
+        size: 100
+    });
+    const users = usersData?.content || [];
+
+    // Fetch structures for autocomplete
+    const { data: structures } = useVisibleStructures();
+
+    // Use user from state if available, otherwise try to find it in the users list
+    const [user, setUser] = useState(userFromState || null);
+    const [isLoadingUser, setIsLoadingUser] = useState(!userFromState && !!userId);
+
+    // Try to find user in users list if not available from state
+    useEffect(() => {
+        if (userId && !user && users.length > 0) {
+            const foundUser = users.find(u => u.userId === parseInt(userId));
+            if (foundUser) {
+                setUser(foundUser);
+                setIsLoadingUser(false);
+            }
+        }
+    }, [userId, user, users]);
+
+    // Set selected user from URL param if available
+    useEffect(() => {
+        if (userId && user) {
+            setSelectedUser(user);
+        }
+    }, [userId, user]);
+
+    // Fetch user profiles based on whether we have a userId or a selected user
+    const effectiveUserId = userId || selectedUser?.userId;
+    const { data: profilesPage, isLoading, isError, error, refetch } = useProfilesByUser(effectiveUserId, {
         page: page,
         size: pageSize,
-        key: ''
+        key: searchTerm,
+        strId: selectedStructure?.strId
     });
     const profiles = profilesPage?.content;
+    // Refetch when userId, searchTerm, selectedStructure, page, or pageSize changes
+    useEffect(() => {
+        refetch();
+    }, [effectiveUserId, searchTerm, selectedStructure?.strId, page, pageSize, refetch]);
+
+    // Cleanup timeout on unmount
+    useEffect(() => {
+        return () => {
+            if (searchTimeoutRef.current) {
+                clearTimeout(searchTimeoutRef.current);
+            }
+        };
+    }, []);
+
+    // Determine if we should show the "select a user" message
+    const showSelectUserMessage = !userId && !selectedUser;
 
     // Handle page change
     const handlePageChange = (newPage) => {
@@ -74,7 +147,39 @@ const UserProfiles = () => {
 
     // Handle back button
     const handleBack = () => {
-        navigate('/administration/users');
+        if (userId) {
+            navigate('/administration/users');
+        } else {
+            navigate(-1);
+        }
+    };
+
+    // Handle search with debouncing
+    const handleSearch = (event) => {
+        const value = event.target.value;
+        setInputValue(value);
+
+        // Clear any existing timeout
+        if (searchTimeoutRef.current) {
+            clearTimeout(searchTimeoutRef.current);
+        }
+
+        // Set a new timeout to update searchTerm after 300ms
+        searchTimeoutRef.current = setTimeout(() => {
+            setSearchTerm(value);
+        }, 300);
+    };
+
+    // Handle user selection
+    const handleUserChange = (event, newValue) => {
+        setSelectedUser(newValue);
+        setPage(0); // Reset to first page when changing user
+    };
+
+    // Handle structure selection
+    const handleStructureChange = (event, newValue) => {
+        setSelectedStructure(newValue);
+        setPage(0); // Reset to first page when changing structure
     };
 
     // Handle add profile
@@ -122,21 +227,39 @@ const UserProfiles = () => {
 
     // Handle confirm actions
     const handleConfirmRevoke = () => {
-        // Implement revoke profile logic here
-        setOpenRevokeDialog(false);
-        setSelectedProfile(null);
+        if (selectedProfile) {
+            revokeProfileMutation.mutate(selectedProfile.id, {
+                onSuccess: () => {
+                    setOpenRevokeDialog(false);
+                    setSelectedProfile(null);
+                },
+                onError: (error) => {
+                    console.error('Error revoking profile:', error);
+                    // Keep dialog open to show error
+                }
+            });
+        }
     };
 
     const handleConfirmDefault = () => {
-        // Implement set default profile logic here
-        setOpenDefaultDialog(false);
-        setSelectedProfile(null);
+        if (selectedProfile) {
+            changeDefaultProfileMutation.mutate(selectedProfile.id, {
+                onSuccess: () => {
+                    setOpenDefaultDialog(false);
+                    setSelectedProfile(null);
+                },
+                onError: (error) => {
+                    console.error('Error setting default profile:', error);
+                    // Keep dialog open to show error
+                }
+            });
+        }
     };
 
     // Show loading state
-    if (isLoading) {
+    if (isLoading || isLoadingUser) {
         return (
-            <MainCard title="Profils de l'utilisateur">
+            <MainCard title="Assignations de profils">
                 <Stack direction="row" justifyContent="center" alignItems="center" sx={{ py: 3 }}>
                     <CircularProgress />
                 </Stack>
@@ -147,13 +270,18 @@ const UserProfiles = () => {
     // Show error state
     if (isError) {
         return (
-            <MainCard title="Profils de l'utilisateur">
+            <MainCard title="Assignations de profils">
                 <Stack direction="row" justifyContent="center" alignItems="center" sx={{ py: 3 }}>
                     <Typography color="error">Error loading profiles: {error?.message || 'Unknown error'}</Typography>
                 </Stack>
             </MainCard>
         );
     }
+
+    // Determine title based on context
+    const pageTitle = userId 
+        ? `Profils de l'utilisateur ${user ? `${user.firstName} ${user.lastName} (${user.email})` : ''}`
+        : "Assignations de profils";
 
     return (
         <MainCard 
@@ -162,35 +290,108 @@ const UserProfiles = () => {
                     <IconButton onClick={handleBack} size="small">
                         <ArrowBackIcon />
                     </IconButton>
-                    <Typography variant="h3">Profils de l'utilisateur</Typography>
+                    <Typography variant="h3">
+                        {pageTitle}
+                    </Typography>
                 </Stack>
             }
         >
             <Grid container spacing={gridSpacing}>
                 <Grid item xs={12}>
-                    <Box display="flex" justifyContent="flex-end" mb={2}>
-                        <Button
-                            variant="contained"
-                            color="primary"
-                            startIcon={<AddIcon />}
-                            onClick={handleAddProfile}
-                        >
-                            Ajouter un profil
-                        </Button>
-                    </Box>
+                    <Grid container spacing={2} alignItems="center">
+                        <Grid item xs={12} sm={6} md={3}>
+                            <FormControl fullWidth>
+                                <InputLabel htmlFor="search-profiles">Recherche</InputLabel>
+                                <OutlinedInput
+                                    id="search-profiles"
+                                    size="small"
+                                    value={inputValue}
+                                    onChange={handleSearch}
+                                    placeholder="Rechercher des profils..."
+                                    startAdornment={
+                                        <InputAdornment position="start">
+                                            <IconSearch stroke={1.5} size="1rem" />
+                                        </InputAdornment>
+                                    }
+                                    label="Recherche"
+                                />
+                            </FormControl>
+                        </Grid>
+                        {!userId && (
+                            <Grid item xs={12} sm={6} md={3}>
+                                <Autocomplete
+                                    id="user-filter"
+                                    options={users || []}
+                                    getOptionLabel={(option) => `${option.firstName} ${option.lastName} (${option.email})`}
+                                    value={selectedUser}
+                                    onChange={handleUserChange}
+                                    renderInput={(params) => (
+                                        <TextField
+                                            {...params}
+                                            label="Filtrer par utilisateur"
+                                            size="small"
+                                            placeholder="Sélectionner un utilisateur"
+                                        />
+                                    )}
+                                    isOptionEqualToValue={(option, value) => option.userId === value?.userId}
+                                />
+                            </Grid>
+                        )}
+                        <Grid item xs={12} sm={6} md={userId ? 4 : 3}>
+                            <Autocomplete
+                                id="structure-filter"
+                                options={structures || []}
+                                getOptionLabel={(option) => option.strName || ''}
+                                value={selectedStructure}
+                                onChange={handleStructureChange}
+                                renderInput={(params) => (
+                                    <TextField
+                                        {...params}
+                                        label="Filtrer par structure"
+                                        size="small"
+                                        placeholder="Sélectionner une structure"
+                                    />
+                                )}
+                                isOptionEqualToValue={(option, value) => option.strId === value?.strId}
+                            />
+                        </Grid>
+                        <Grid item xs={12} sm={6} md={userId ? 4 : 3} sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
+                            <Tooltip title={selectedUser ? `Ajouter un profil pour ${selectedUser.firstName} ${selectedUser.lastName}` : "Ajouter un profil"}>
+                                <Button
+                                    variant="contained"
+                                    color="primary"
+                                    onClick={handleAddProfile}
+                                    sx={{ minWidth: '40px', width: '40px', height: '40px', padding: 0 }}
+                                    disabled={!effectiveUserId}
+                                >
+                                    <AddIcon />
+                                </Button>
+                            </Tooltip>
+                        </Grid>
+                    </Grid>
                 </Grid>
-                
+
+                {/* Display total count if available */}
+                {!showSelectUserMessage && (
+                    <Grid item xs={12}>
+                        <Typography variant="subtitle1" sx={{ mb: 1 }}>
+                            Total: {profilesPage?.totalElements || 0} élément{(profilesPage?.totalElements || 0) !== 1 ? 's' : ''}
+                        </Typography>
+                    </Grid>
+                )}
+
                 <Grid item xs={12}>
-                    <TableContainer component={Paper}>
+                    <TableContainer component={Paper} sx={{ border: 1, borderColor: 'divider', borderRadius: 1, maxHeight: 440 }}>
                         <Table sx={{ minWidth: 650 }} aria-label="user profiles table" size="small">
                             <TableHead>
                                 <TableRow>
+                                    <TableCell>Nom</TableCell>
+                                    <TableCell>Email</TableCell>
                                     <TableCell>Profil</TableCell>
                                     <TableCell>Structure</TableCell>
                                     <TableCell>Type</TableCell>
                                     <TableCell>Date de début</TableCell>
                                     <TableCell>Date de fin</TableCell>
-                                    <TableCell>Statut</TableCell>
                                     <TableCell>Par défaut</TableCell>
                                     <TableCell align="center">Actions</TableCell>
                                 </TableRow>
@@ -200,7 +401,7 @@ const UserProfiles = () => {
                                     profiles.map((profile) => {
                                         const isCurrent = profile.assStatusCode === 'STA_ASS_CUR';
                                         const isRevoked = profile.assStatusCode === 'STA_ASS_INACT';
-                                        
+
                                         return (
                                             <TableRow
                                                 key={profile.id}
@@ -214,8 +415,11 @@ const UserProfiles = () => {
                                                 }}
                                             >
                                                 <TableCell>
+                                                    <Typography variant="subtitle2">{profile.firstName} {profile.lastName}</Typography>
+                                                </TableCell>
+                                                <TableCell>{profile.email}</TableCell>
+                                                <TableCell>
                                                     <Typography variant="subtitle2">{profile.profileName}</Typography>
-                                                    <Typography variant="caption" color="textSecondary">{profile.profileCode}</Typography>
                                                 </TableCell>
                                                 <TableCell>{profile.strName}</TableCell>
                                                 <TableCell>{profile.userProfileAssTypeName}</TableCell>
@@ -223,43 +427,43 @@ const UserProfiles = () => {
                                                 <TableCell>
                                                     {profile.endingDate ? new Date(profile.endingDate).toLocaleDateString() : '-'}
                                                 </TableCell>
-                                                <TableCell>
-                                                    <Chip 
-                                                        label={profile.assStatusName} 
-                                                        size="small"
-                                                        color={isRevoked ? 'error' : isCurrent ? 'success' : 'default'}
-                                                    />
-                                                </TableCell>
+
                                                 <TableCell align="center">
                                                     {isCurrent ? <StarIcon color="warning" /> : <StarBorderIcon />}
                                                 </TableCell>
                                                 <TableCell align="center">
                                                     <Stack direction="row" spacing={1} justifyContent="center">
-                                                        <IconButton 
-                                                            size="small" 
-                                                            color="primary"
-                                                            onClick={() => handleEditProfile(profile)}
-                                                            disabled={isRevoked}
-                                                        >
-                                                            <EditIcon fontSize="small" />
-                                                        </IconButton>
-                                                        {!isRevoked && (
+                                                        <Tooltip title="Modifier">
                                                             <IconButton 
                                                                 size="small" 
-                                                                color="error"
-                                                                onClick={() => handleRevokeProfile(profile)}
+                                                                color="primary"
+                                                                onClick={() => handleEditProfile(profile)}
+                                                                disabled={isRevoked}
                                                             >
-                                                                <DeleteIcon fontSize="small" />
+                                                                <EditIcon fontSize="small" />
                                                             </IconButton>
+                                                        </Tooltip>
+                                                        {!isRevoked && (
+                                                            <Tooltip title="Révoquer">
+                                                                <IconButton 
+                                                                    size="small" 
+                                                                    color="error"
+                                                                    onClick={() => handleRevokeProfile(profile)}
+                                                                >
+                                                                    <DeleteIcon fontSize="small" />
+                                                                </IconButton>
+                                                            </Tooltip>
                                                         )}
                                                         {!isRevoked && !isCurrent && (
-                                                            <IconButton 
-                                                                size="small" 
-                                                                color="warning"
-                                                                onClick={() => handleSetDefaultProfile(profile)}
-                                                            >
-                                                                <StarIcon fontSize="small" />
-                                                            </IconButton>
+                                                            <Tooltip title="Définir par défaut">
+                                                                <IconButton 
+                                                                    size="small" 
+                                                                    color="warning"
+                                                                    onClick={() => handleSetDefaultProfile(profile)}
+                                                                >
+                                                                    <StarIcon fontSize="small" />
+                                                                </IconButton>
+                                                            </Tooltip>
                                                         )}
                                                     </Stack>
                                                 </TableCell>
@@ -268,7 +472,7 @@ const UserProfiles = () => {
                                     })
                                 ) : (
                                     <TableRow>
-                                        <TableCell colSpan={8} align="center">
+                                        <TableCell colSpan={9} align="center">
                                             <Typography variant="subtitle1">Aucun profil trouvé</Typography>
                                         </TableCell>
                                     </TableRow>
@@ -277,17 +481,17 @@ const UserProfiles = () => {
                         </Table>
                     </TableContainer>
                 </Grid>
-                
+
                 {/* Pagination */}
-                {profilesPage && (
+                { (
                     <Grid item xs={12}>
                         <Pagination
                             page={page}
-                            count={profilesPage.totalPages}
+                            count={profilesPage?.totalPages || 1}
                             rowsPerPage={pageSize}
                             onPageChange={handlePageChange}
                             onRowsPerPageChange={handlePageSizeChange}
-                            totalCount={profilesPage.totalElements}
+                            totalCount={profilesPage?.totalElements || 0}
                         />
                     </Grid>
                 )}
@@ -297,7 +501,8 @@ const UserProfiles = () => {
             <AddUserProfileModal 
                 open={openAddModal} 
                 handleClose={handleCloseAddModal} 
-                userId={userId}
+                userId={effectiveUserId}
+                user={user || selectedUser}
             />
 
             {/* Edit Profile Modal */}
@@ -318,6 +523,8 @@ const UserProfiles = () => {
                 confirmBtnText="Révoquer"
                 cancelBtnText="Annuler"
                 handleConfirm={handleConfirmRevoke}
+                loading={revokeProfileMutation.isPending}
+                error={revokeProfileMutation.isError ? revokeProfileMutation.error?.message || "Une erreur est survenue" : null}
             />
 
             {/* Set Default Profile Dialog */}
@@ -329,6 +536,8 @@ const UserProfiles = () => {
                 confirmBtnText="Confirmer"
                 cancelBtnText="Annuler"
                 handleConfirm={handleConfirmDefault}
+                loading={changeDefaultProfileMutation.isPending}
+                error={changeDefaultProfileMutation.isError ? changeDefaultProfileMutation.error?.message || "Une erreur est survenue" : null}
             />
         </MainCard>
     );

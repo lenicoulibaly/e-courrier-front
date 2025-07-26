@@ -107,10 +107,10 @@ export const useAllProfiles = () => {
 };
 
 export const useProfilesByUser = (userId, params = {}) => {
+    const queryParams = { ...params, userId };
     return useQuery({
         queryKey: PROFILES_KEYS.byUser(userId, params),
-        queryFn: () => profileApi.searchProfilesByUser(userId, params),
-        enabled: !!userId,
+        queryFn: () => profileApi.searchProfilesByUser(queryParams),
     });
 };
 
@@ -154,5 +154,35 @@ export const usePrivilegesByRoleCodes = (roleCodes = []) => {
         queryKey: PRIVILEGES_KEYS.byRoleCodes(roleCodes),
         queryFn: () => privilegeApi.getPrivilegesByRoleCodes(roleCodes),
         enabled: roleCodes.length > 0,
+    });
+};
+
+// Hook for revoking profile assignment
+export const useRevokeProfileAssignment = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: (id) => authorityApi.revokeProfileAssignment(id),
+        onSuccess: (data, variables, context) => {
+            // Invalidate all profiles queries
+            queryClient.invalidateQueries({ queryKey: PROFILES_KEYS.all });
+            // Invalidate all authorities queries
+            queryClient.invalidateQueries({ queryKey: AUTHORITIES_KEYS.all });
+        },
+    });
+};
+
+// Hook for changing default profile
+export const useChangeDefaultProfile = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: (id) => authorityApi.changeDefaultProfile(id),
+        onSuccess: (data, variables, context) => {
+            // Invalidate all profiles queries
+            queryClient.invalidateQueries({ queryKey: PROFILES_KEYS.all });
+            // Invalidate all authorities queries
+            queryClient.invalidateQueries({ queryKey: AUTHORITIES_KEYS.all });
+        },
     });
 };

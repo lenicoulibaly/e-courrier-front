@@ -10,8 +10,11 @@ import {
     DialogContent,
     DialogContentText,
     DialogTitle,
-    IconButton, Tooltip,
-    Typography
+    IconButton, 
+    Tooltip,
+    Typography,
+    CircularProgress,
+    Alert
 } from '@mui/material';
 
 // ===============================|| UI DIALOG - SWEET ALERT ||=============================== //
@@ -24,6 +27,8 @@ export default function CustomAlertDialog({
     content = 'Confirmez-vous l\'enregistrement ?',
     confirmBtnText = 'Confirmer',
     cancelBtnText = 'Annuler',
+    loading = false,
+    error = null,
     // Legacy props for backward compatibility
     openLabel = 'Enregistrer',
     variant = 'contained',
@@ -115,6 +120,11 @@ export default function CustomAlertDialog({
                                     {content || message}
                                 </Typography>
                             </DialogContentText>
+                            {error && (
+                                <Alert severity="error" sx={{ mt: 2 }}>
+                                    {error}
+                                </Alert>
+                            )}
                         </DialogContent>
                         <DialogActions sx={{ pr: 2.5 }}>
                             <Button
@@ -129,9 +139,15 @@ export default function CustomAlertDialog({
                                 size="small" 
                                 type={type} 
                                 onClick={onConfirm} 
+                                disabled={loading}
                                 autoFocus
+                                sx={{ minWidth: '100px' }}
                             >
-                                {confirmBtnText || confirmLabel}
+                                {loading ? (
+                                    <CircularProgress size={24} color="inherit" />
+                                ) : (
+                                    confirmBtnText || confirmLabel
+                                )}
                             </Button>
                         </DialogActions>
                     </>
@@ -150,6 +166,8 @@ CustomAlertDialog.propTypes = {
     content: PropTypes.string,
     confirmBtnText: PropTypes.string,
     cancelBtnText: PropTypes.string,
+    loading: PropTypes.bool,
+    error: PropTypes.string,
 
     // Legacy API props
     openLabel: PropTypes.string,

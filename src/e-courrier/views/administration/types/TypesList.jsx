@@ -35,7 +35,7 @@ const TypesList = ({ searchTerm, groupCodes, onEditType }) => {
     const theme = useTheme();
     const [filteredTypes, setFilteredTypes] = useState([]);
     const [page, setPage] = useState(0);
-    const [pageSize, setPageSize] = useState(3);
+    const [pageSize, setPageSize] = useState(10);
     const [configureSubtypesModalOpen, setConfigureSubtypesModalOpen] = useState(false);
     const [selectedType, setSelectedType] = useState(null);
 
