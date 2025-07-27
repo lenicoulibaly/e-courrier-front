@@ -31,11 +31,12 @@ import { useTheme, alpha } from '@mui/material/styles';
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
 import { gridSpacing } from 'store/constant';
-import { useProfilesByUser, useRevokeProfileAssignment, useChangeDefaultProfile } from '../../../hooks/query/useAuthorities';
+import { useProfilesByUser, useRevokeProfileAssignment, useChangeDefaultProfile, useRestoreProfileAssignment } from '../../../hooks/query/useAuthorities';
 import { useSearchUsers } from '../../../hooks/query/useUsers';
 import { useVisibleStructures } from '../../../hooks/query/useStructures';
 import Pagination from '../../../components/commons/Pagination';
 import CustomAlertDialog from '../../../components/commons/CustomAlertDialog';
+import FloatingAlert from '../../../components/commons/FloatingAlert';
 import AddUserProfileModal from './AddUserProfileModal';
 import EditUserProfileModal from './EditUserProfileModal';
 
@@ -46,6 +47,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import StarIcon from '@mui/icons-material/Star';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
 import AddIcon from '@mui/icons-material/Add';
+import RestoreIcon from '@mui/icons-material/Restore';
 import { IconSearch } from '@tabler/icons-react';
 
 // ==============================|| USER PROFILES ||============================== //
@@ -69,12 +71,18 @@ const UserProfiles = () => {
     const [openAddModal, setOpenAddModal] = useState(false);
     const [openEditModal, setOpenEditModal] = useState(false);
     const [openRevokeDialog, setOpenRevokeDialog] = useState(false);
-    const [openDefaultDialog, setOpenDefaultDialog] = useState(false);
+    const [openRestoreDialog, setOpenRestoreDialog] = useState(false);
     const [selectedProfile, setSelectedProfile] = useState(null);
+
+    // Alert state
+    const [alertOpen, setAlertOpen] = useState(false);
+    const [alertMessage, setAlertMessage] = useState('');
+    const [alertSeverity, setAlertSeverity] = useState('success');
 
     // Mutations for profile actions
     const revokeProfileMutation = useRevokeProfileAssignment();
     const changeDefaultProfileMutation = useChangeDefaultProfile();
+    const restoreProfileMutation = useRestoreProfileAssignment();
 
     // Fetch users for autocomplete
     const { data: usersData } = useSearchUsers({
@@ -199,11 +207,12 @@ const UserProfiles = () => {
         setOpenRevokeDialog(true);
     };
 
-    // Handle set default profile
-    const handleSetDefaultProfile = (profile) => {
+    // Handle restore profile
+    const handleRestoreProfile = (profile) => {
         setSelectedProfile(profile);
-        setOpenDefaultDialog(true);
+        setOpenRestoreDialog(true);
     };
+
 
     // Handle close modals and dialogs
     const handleCloseAddModal = () => {
@@ -220,8 +229,9 @@ const UserProfiles = () => {
         setSelectedProfile(null);
     };
 
-    const handleCloseDefaultDialog = () => {
-        setOpenDefaultDialog(false);
+
+    const handleCloseRestoreDialog = () => {
+        setOpenRestoreDialog(false);
         setSelectedProfile(null);
     };
 
@@ -232,6 +242,10 @@ const UserProfiles = () => {
                 onSuccess: () => {
                     setOpenRevokeDialog(false);
                     setSelectedProfile(null);
+                    // Show success message
+                    setAlertMessage(`Le profil ${selectedProfile.profileName} a été révoqué avec succès`);
+                    setAlertSeverity('success');
+                    setAlertOpen(true);
                 },
                 onError: (error) => {
                     console.error('Error revoking profile:', error);
@@ -241,15 +255,20 @@ const UserProfiles = () => {
         }
     };
 
-    const handleConfirmDefault = () => {
+
+    const handleConfirmRestore = () => {
         if (selectedProfile) {
-            changeDefaultProfileMutation.mutate(selectedProfile.id, {
+            restoreProfileMutation.mutate(selectedProfile.id, {
                 onSuccess: () => {
-                    setOpenDefaultDialog(false);
+                    setOpenRestoreDialog(false);
                     setSelectedProfile(null);
+                    // Show success message
+                    setAlertMessage(`Le profil ${selectedProfile.profileName} a été restauré avec succès`);
+                    setAlertSeverity('success');
+                    setAlertOpen(true);
                 },
                 onError: (error) => {
-                    console.error('Error setting default profile:', error);
+                    console.error('Error restoring profile:', error);
                     // Keep dialog open to show error
                 }
             });
@@ -433,37 +452,37 @@ const UserProfiles = () => {
                                                 </TableCell>
                                                 <TableCell align="center">
                                                     <Stack direction="row" spacing={1} justifyContent="center">
-                                                        <Tooltip title="Modifier">
-                                                            <IconButton 
-                                                                size="small" 
-                                                                color="primary"
-                                                                onClick={() => handleEditProfile(profile)}
-                                                                disabled={isRevoked}
-                                                            >
-                                                                <EditIcon fontSize="small" />
-                                                            </IconButton>
-                                                        </Tooltip>
-                                                        {!isRevoked && (
-                                                            <Tooltip title="Révoquer">
+                                                        {isRevoked ? (
+                                                            <Tooltip title="Restaurer">
                                                                 <IconButton 
                                                                     size="small" 
-                                                                    color="error"
-                                                                    onClick={() => handleRevokeProfile(profile)}
+                                                                    color="success"
+                                                                    onClick={() => handleRestoreProfile(profile)}
                                                                 >
-                                                                    <DeleteIcon fontSize="small" />
+                                                                    <RestoreIcon fontSize="small" />
                                                                 </IconButton>
                                                             </Tooltip>
-                                                        )}
-                                                        {!isRevoked && !isCurrent && (
-                                                            <Tooltip title="Définir par défaut">
-                                                                <IconButton 
-                                                                    size="small" 
-                                                                    color="warning"
-                                                                    onClick={() => handleSetDefaultProfile(profile)}
-                                                                >
-                                                                    <StarIcon fontSize="small" />
-                                                                </IconButton>
-                                                            </Tooltip>
+                                                        ) : (
+                                                            <>
+                                                                <Tooltip title="Modifier">
+                                                                    <IconButton 
+                                                                        size="small" 
+                                                                        color="primary"
+                                                                        onClick={() => handleEditProfile(profile)}
+                                                                    >
+                                                                        <EditIcon fontSize="small" />
+                                                                    </IconButton>
+                                                                </Tooltip>
+                                                                <Tooltip title="Révoquer">
+                                                                    <IconButton 
+                                                                        size="small" 
+                                                                        color="error"
+                                                                        onClick={() => handleRevokeProfile(profile)}
+                                                                    >
+                                                                        <DeleteIcon fontSize="small" />
+                                                                    </IconButton>
+                                                                </Tooltip>
+                                                            </>
                                                         )}
                                                     </Stack>
                                                 </TableCell>
@@ -527,17 +546,27 @@ const UserProfiles = () => {
                 error={revokeProfileMutation.isError ? revokeProfileMutation.error?.message || "Une erreur est survenue" : null}
             />
 
-            {/* Set Default Profile Dialog */}
+
+            {/* Restore Profile Dialog */}
             <CustomAlertDialog
-                open={openDefaultDialog}
-                handleClose={handleCloseDefaultDialog}
-                title="Définir comme profil par défaut"
-                content={`Êtes-vous sûr de vouloir définir ${selectedProfile?.profileName} comme profil par défaut ?`}
-                confirmBtnText="Confirmer"
+                open={openRestoreDialog}
+                handleClose={handleCloseRestoreDialog}
+                title="Restaurer le profil"
+                content={`Êtes-vous sûr de vouloir restaurer le profil ${selectedProfile?.profileName} ?`}
+                confirmBtnText="Restaurer"
                 cancelBtnText="Annuler"
-                handleConfirm={handleConfirmDefault}
-                loading={changeDefaultProfileMutation.isPending}
-                error={changeDefaultProfileMutation.isError ? changeDefaultProfileMutation.error?.message || "Une erreur est survenue" : null}
+                handleConfirm={handleConfirmRestore}
+                loading={restoreProfileMutation.isPending}
+                error={restoreProfileMutation.isError ? restoreProfileMutation.error?.message || "Une erreur est survenue" : null}
+            />
+
+            {/* Success Alert */}
+            <FloatingAlert
+                open={alertOpen}
+                feedBackMessages={alertMessage}
+                severity={alertSeverity}
+                timeout={alertSeverity === 'success' ? 2 : 7}
+                onClose={() => setAlertOpen(false)}
             />
         </MainCard>
     );

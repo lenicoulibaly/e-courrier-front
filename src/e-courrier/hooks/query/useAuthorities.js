@@ -186,3 +186,27 @@ export const useChangeDefaultProfile = () => {
         },
     });
 };
+
+// Hook for restoring profile assignment
+export const useRestoreProfileAssignment = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: (id) => authorityApi.restoreProfileAssignment(id),
+        onSuccess: (data, variables, context) => {
+            // Invalidate all profiles queries
+            queryClient.invalidateQueries({ queryKey: PROFILES_KEYS.all });
+            // Invalidate all authorities queries
+            queryClient.invalidateQueries({ queryKey: AUTHORITIES_KEYS.all });
+        },
+    });
+};
+
+// Hook for fetching active profiles for a user
+export const useActiveUserProfiles = (userId) => {
+    return useQuery({
+        queryKey: [...PROFILES_KEYS.all, 'active', userId],
+        queryFn: () => authorityApi.getActiveUserProfiles(userId),
+        enabled: !!userId,
+    });
+};

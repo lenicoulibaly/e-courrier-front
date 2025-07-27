@@ -37,12 +37,12 @@ const ForgotPassword = () => {
                                         <Grid container alignItems="center" justifyContent="center" textAlign="center" spacing={2}>
                                             <Grid item xs={12}>
                                                 <Typography color="secondary.main" gutterBottom variant={downMD ? 'h3' : 'h2'}>
-                                                    Forgot password?
+                                                    Mot de passe oublié?
                                                 </Typography>
                                             </Grid>
                                             <Grid item xs={12}>
                                                 <Typography variant="caption" fontSize="16px" textAlign="center">
-                                                    Enter your email address below and we&apos;ll send you password reset OTP.
+                                                    Entrez votre adresse e-mail ci-dessous et nous vous enverrons un lien de réinitialisation de mot de passe.
                                                 </Typography>
                                             </Grid>
                                         </Grid>
@@ -61,7 +61,7 @@ const ForgotPassword = () => {
                                                 variant="subtitle1"
                                                 sx={{ textDecoration: 'none' }}
                                             >
-                                                Already have an account?
+                                                Vous avez déjà un compte?
                                             </Typography>
                                         </Grid>
                                     </Grid>

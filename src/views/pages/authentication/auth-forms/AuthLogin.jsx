@@ -147,7 +147,7 @@ const JWTLogin = ({ loginProp, ...others }) => {
                                 color="secondary"
                                 sx={{ textDecoration: 'none' }}
                             >
-                                Forgot Password?
+                                Mot de passe oublié?
                             </Typography>
                         </Grid>
                     </Grid>

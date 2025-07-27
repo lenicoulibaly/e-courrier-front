@@ -64,6 +64,12 @@ export const userApi = {
         return response.data;
     },
 
+    // Endpoint public pour réinitialisation de mot de passe
+    sendResetPasswordEmailByEmail: async (emailData) => {
+        const response = await apiClient.post('/users/open/send-reset-password-email', emailData);
+        return response.data;
+    },
+
     // Connexion (endpoint public)
     login: async (credentials) => {
         const response = await apiClient.post('/users/open/login', credentials);
@@ -196,9 +202,21 @@ export const authorityApi = {
         return response.data;
     },
 
+    // Restaurer l'assignation d'un profil
+    restoreProfileAssignment: async (id) => {
+        const response = await apiClient.put(`/authorities/restore-profile-assignment/${id}`);
+        return response.data;
+    },
+
     // Changer le profil par défaut
     changeDefaultProfile: async (id) => {
         const response = await apiClient.put(`/authorities/change-default-profile/${id}`);
+        return response.data;
+    },
+
+    // Obtenir les profils actifs d'un utilisateur
+    getActiveUserProfiles: async (userId) => {
+        const response = await apiClient.get(`/authorities/user-profiles/active/${userId}`);
         return response.data;
     },
 };

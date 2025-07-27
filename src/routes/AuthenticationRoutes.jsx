@@ -4,6 +4,9 @@ import { lazy } from 'react';
 import Loadable from 'ui-component/Loadable';
 import MinimalLayout from 'layout/MinimalLayout';
 
+// reset password form
+const ResetPasswordForm = Loadable(lazy(() => import('views/pages/authentication/reset-password-form/ResetPasswordForm')));
+
 // login option 1 routing
 const AuthLogin1 = Loadable(lazy(() => import('views/pages/authentication/authentication1/Login1')));
 const AuthRegister1 = Loadable(lazy(() => import('views/pages/authentication/authentication1/Register1')));
@@ -158,6 +161,10 @@ const AuthenticationRoutes = {
         {
             path: '/pages/privacy-policy',
             element: <PagesPrivacyPolicy />
+        },
+        {
+            path: '/reset-password-form',
+            element: <ResetPasswordForm />
         }
     ]
 };

@@ -5,24 +5,43 @@ import { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 
 
-const FloatingAlert = ({open, feedBackMessages, severity}) => {
+const FloatingAlert = ({open, feedBackMessages, severity, timeout = 3, onClose}) => {
     const [feedBackOpen, setFeedBackOpen] = useState(open)
-    useEffect(()=>
-    {
 
-    }, [open, feedBackMessages, severity])
     useEffect(()=>
     {
         setFeedBackOpen(open)
-    }, [feedBackMessages])
+    }, [open, feedBackMessages, severity])
+
+    const handleClose = (event, reason) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+
+        setFeedBackOpen(false);
+
+        // Notify parent component
+        if (onClose) {
+            onClose();
+        }
+    };
+
     return (
         <Snackbar
             anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
             open={feedBackOpen}
-            autoHideDuration={3000} // Adjust the duration as needed
-
+            autoHideDuration={timeout * 1000} // Convert seconds to milliseconds
+            onClose={handleClose}
+            sx={{ zIndex: 9999 }} // Ensure it appears above modals
         >
-            <Alert style={{color: "white"}} alert elevation={6} variant="filled" severity={severity} onClose={() => setFeedBackOpen(false)}>
+            <Alert 
+                style={{color: "white"}} 
+                alert 
+                elevation={6} 
+                variant="filled" 
+                severity={severity} 
+                onClose={handleClose}
+            >
                 {
                     Array.isArray(feedBackMessages) ? feedBackMessages?.map((message, index)=>
                     {
@@ -33,9 +52,12 @@ const FloatingAlert = ({open, feedBackMessages, severity}) => {
         </Snackbar>
     );
 };
+
 FloatingAlert.propTypes = {
     open: PropTypes.bool.isRequired,
     feedBackMessages: PropTypes.oneOfType([PropTypes.string, PropTypes.array]),
-    severity: PropTypes.string
+    severity: PropTypes.string,
+    timeout: PropTypes.number,
+    onClose: PropTypes.func
 };
 export default FloatingAlert;

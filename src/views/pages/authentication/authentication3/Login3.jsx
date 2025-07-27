@@ -45,7 +45,13 @@ const Login = () => {
                                         >
                                             <Grid item>
                                                 <Stack alignItems="center" justifyContent="center" spacing={1}>
-                                                    <Typography color="secondary.main" gutterBottom variant={downMD ? 'h3' : 'h2'}>
+                                                    <Typography 
+                                                        color="secondary.main" 
+                                                        gutterBottom 
+                                                        variant={downMD ? 'h4' : 'h3'} 
+                                                        textAlign="center"
+                                                        sx={{ maxWidth: '100%' }}
+                                                    >
                                                         Bien venu sur la plateforme e-courrier
                                                     </Typography>
                                                     <Typography

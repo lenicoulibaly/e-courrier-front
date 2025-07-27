@@ -1,42 +1,38 @@
 import { useEffect, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 
 // material-ui
 import { useTheme } from '@mui/material/styles';
 import Avatar from '@mui/material/Avatar';
 import Box from '@mui/material/Box';
-import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
 import Chip from '@mui/material/Chip';
 import ClickAwayListener from '@mui/material/ClickAwayListener';
 import Divider from '@mui/material/Divider';
 import Grid from '@mui/material/Grid';
-import InputAdornment from '@mui/material/InputAdornment';
 import List from '@mui/material/List';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import OutlinedInput from '@mui/material/OutlinedInput';
 import Paper from '@mui/material/Paper';
 import Popper from '@mui/material/Popper';
 import Stack from '@mui/material/Stack';
-import Switch from '@mui/material/Switch';
 import Typography from '@mui/material/Typography';
 
 // third-party
-import { FormattedMessage } from 'react-intl';
 import PerfectScrollbar from 'react-perfect-scrollbar';
 
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
 import Transitions from 'ui-component/extended/Transitions';
-import UpgradePlanCard from './UpgradePlanCard';
+import UserProfilesModal from './UserProfilesModal';
+import ChangePasswordModal from './ChangePasswordModal';
 import useAuth from 'hooks/useAuth';
+import { useActiveUserProfiles } from 'e-courrier/hooks/query/useAuthorities';
 import User1 from 'assets/images/users/user-round.svg';
 import { ThemeMode } from 'config';
 
 // assets
-import { IconLogout, IconSearch, IconSettings, IconUser } from '@tabler/icons-react';
+import { IconLogout, IconSettings, IconLock } from '@tabler/icons-react';
+import StarIcon from '@mui/icons-material/Star';
 import useConfig from 'hooks/useConfig';
 
 // ==============================|| PROFILE MENU ||============================== //
@@ -44,14 +40,17 @@ import useConfig from 'hooks/useConfig';
 const ProfileSection = () => {
     const theme = useTheme();
     const { mode, borderRadius } = useConfig();
-    const navigate = useNavigate();
 
-    const [sdm, setSdm] = useState(true);
-    const [value, setValue] = useState('');
-    const [notification, setNotification] = useState(false);
-    const [selectedIndex, setSelectedIndex] = useState(-1);
     const { logout, user } = useAuth();
     const [open, setOpen] = useState(false);
+    const [openProfilesModal, setOpenProfilesModal] = useState(false);
+    const [openChangePasswordModal, setOpenChangePasswordModal] = useState(false);
+
+    // Fetch active profiles for the current user
+    const { data: activeProfiles } = useActiveUserProfiles(user?.userId);
+
+    // Find default profile
+    const defaultProfile = activeProfiles?.find(profile => profile.assStatusCode === 'STA_ASS_CUR');
 
     /**
      * anchorRef is used on different components and specifying one type leads to other components throwing an error
@@ -65,14 +64,6 @@ const ProfileSection = () => {
         }
     };
 
-    const handleListItemClick = (event, index, route = '') => {
-        setSelectedIndex(index);
-        handleClose(event);
-
-        if (route && route !== '') {
-            navigate(route);
-        }
-    };
 
     const handleToggle = () => {
         setOpen((prevOpen) => !prevOpen);
@@ -84,6 +75,24 @@ const ProfileSection = () => {
         }
 
         setOpen(false);
+    };
+
+    const handleOpenProfilesModal = () => {
+        setOpenProfilesModal(true);
+        setOpen(false);
+    };
+
+    const handleCloseProfilesModal = () => {
+        setOpenProfilesModal(false);
+    };
+
+    const handleOpenChangePasswordModal = () => {
+        setOpenChangePasswordModal(true);
+        setOpen(false);
+    };
+
+    const handleCloseChangePasswordModal = () => {
+        setOpenChangePasswordModal(false);
     };
 
     const prevOpen = useRef(open);
@@ -168,72 +177,21 @@ const ProfileSection = () => {
                                         <Box sx={{ p: 2, pb: 0 }}>
                                             <Stack>
                                                 <Stack direction="row" spacing={0.5} alignItems="center">
-                                                    <Typography variant="h4">Good Morning,</Typography>
-                                                    <Typography component="span" variant="h4" sx={{ fontWeight: 400 }}>
-                                                        {user?.name}
+                                                    <Typography component="span" variant="h4" sx={{ fontWeight: 700 }}>
+                                                        {user?.firstName} {user?.lastName}
                                                     </Typography>
                                                 </Stack>
-                                                <Typography variant="subtitle2">Project Admin</Typography>
+                                                <Stack direction="row" spacing={1} alignItems="center">
+                                                    <Typography variant="subtitle2">
+                                                        {defaultProfile ? `${defaultProfile.profileName} (${defaultProfile.strName})` : 'Aucun profil par défaut'}
+                                                    </Typography>
+                                                    {defaultProfile && <StarIcon fontSize="small" color="warning" />}
+                                                </Stack>
                                             </Stack>
-                                            <OutlinedInput
-                                                sx={{ width: '100%', pr: 1, pl: 2, my: 2 }}
-                                                id="input-search-profile"
-                                                value={value}
-                                                onChange={(e) => setValue(e.target.value)}
-                                                placeholder="Search profile options"
-                                                startAdornment={
-                                                    <InputAdornment position="start">
-                                                        <IconSearch stroke={1.5} size="16px" />
-                                                    </InputAdornment>
-                                                }
-                                                aria-describedby="search-helper-text"
-                                                inputProps={{
-                                                    'aria-label': 'weight'
-                                                }}
-                                            />
                                             <Divider />
                                         </Box>
                                         <PerfectScrollbar style={{ height: '100%', maxHeight: 'calc(100vh - 250px)', overflowX: 'hidden' }}>
                                             <Box sx={{ p: 2, pt: 0 }}>
-                                                <UpgradePlanCard />
-                                                <Divider />
-                                                <Card sx={{ bgcolor: mode === ThemeMode.DARK ? 'dark.800' : 'primary.light', my: 2 }}>
-                                                    <CardContent>
-                                                        <Grid container spacing={3} direction="column">
-                                                            <Grid item>
-                                                                <Grid item container alignItems="center" justifyContent="space-between">
-                                                                    <Grid item>
-                                                                        <Typography variant="subtitle1">Start DND Mode</Typography>
-                                                                    </Grid>
-                                                                    <Grid item>
-                                                                        <Switch
-                                                                            color="primary"
-                                                                            checked={sdm}
-                                                                            onChange={(e) => setSdm(e.target.checked)}
-                                                                            name="sdm"
-                                                                            size="small"
-                                                                        />
-                                                                    </Grid>
-                                                                </Grid>
-                                                            </Grid>
-                                                            <Grid item>
-                                                                <Grid item container alignItems="center" justifyContent="space-between">
-                                                                    <Grid item>
-                                                                        <Typography variant="subtitle1">Allow Notifications</Typography>
-                                                                    </Grid>
-                                                                    <Grid item>
-                                                                        <Switch
-                                                                            checked={notification}
-                                                                            onChange={(e) => setNotification(e.target.checked)}
-                                                                            name="sdm"
-                                                                            size="small"
-                                                                        />
-                                                                    </Grid>
-                                                                </Grid>
-                                                            </Grid>
-                                                        </Grid>
-                                                    </CardContent>
-                                                </Card>
                                                 <Divider />
                                                 <List
                                                     component="nav"
@@ -247,10 +205,7 @@ const ProfileSection = () => {
                                                 >
                                                     <ListItemButton
                                                         sx={{ borderRadius: `${borderRadius}px` }}
-                                                        selected={selectedIndex === 0}
-                                                        onClick={(event) =>
-                                                            handleListItemClick(event, 0, '/apps/user/account-profile/profile1')
-                                                        }
+                                                        onClick={handleOpenProfilesModal}
                                                     >
                                                         <ListItemIcon>
                                                             <IconSettings stroke={1.5} size="20px" />
@@ -258,44 +213,28 @@ const ProfileSection = () => {
                                                         <ListItemText
                                                             primary={
                                                                 <Typography variant="body2">
-                                                                    <FormattedMessage id="account-settings" />
+                                                                    Voir mes profils actifs
                                                                 </Typography>
                                                             }
                                                         />
                                                     </ListItemButton>
                                                     <ListItemButton
                                                         sx={{ borderRadius: `${borderRadius}px` }}
-                                                        selected={selectedIndex === 1}
-                                                        onClick={(event) =>
-                                                            handleListItemClick(event, 1, '/apps/user/social-profile/posts')
-                                                        }
+                                                        onClick={handleOpenChangePasswordModal}
                                                     >
                                                         <ListItemIcon>
-                                                            <IconUser stroke={1.5} size="20px" />
+                                                            <IconLock stroke={1.5} size="20px" />
                                                         </ListItemIcon>
                                                         <ListItemText
                                                             primary={
-                                                                <Grid container spacing={1} justifyContent="space-between">
-                                                                    <Grid item>
-                                                                        <Typography variant="body2">
-                                                                            <FormattedMessage id="social-profile" />
-                                                                        </Typography>
-                                                                    </Grid>
-                                                                    <Grid item>
-                                                                        <Chip
-                                                                            label="02"
-                                                                            size="small"
-                                                                            color="warning"
-                                                                            sx={{ '& .MuiChip-label': { mt: 0.25 } }}
-                                                                        />
-                                                                    </Grid>
-                                                                </Grid>
+                                                                <Typography variant="body2">
+                                                                    Changer mot de passe
+                                                                </Typography>
                                                             }
                                                         />
                                                     </ListItemButton>
                                                     <ListItemButton
                                                         sx={{ borderRadius: `${borderRadius}px` }}
-                                                        selected={selectedIndex === 4}
                                                         onClick={handleLogout}
                                                     >
                                                         <ListItemIcon>
@@ -304,7 +243,7 @@ const ProfileSection = () => {
                                                         <ListItemText
                                                             primary={
                                                                 <Typography variant="body2">
-                                                                    <FormattedMessage id="logout" />
+                                                                    Déconnexion
                                                                 </Typography>
                                                             }
                                                         />
@@ -319,6 +258,19 @@ const ProfileSection = () => {
                     </ClickAwayListener>
                 )}
             </Popper>
+
+            {/* User Profiles Modal */}
+            <UserProfilesModal 
+                open={openProfilesModal} 
+                handleClose={handleCloseProfilesModal} 
+                userId={user?.userId} 
+            />
+
+            {/* Change Password Modal */}
+            <ChangePasswordModal
+                open={openChangePasswordModal}
+                handleClose={handleCloseChangePasswordModal}
+            />
         </>
     );
 };

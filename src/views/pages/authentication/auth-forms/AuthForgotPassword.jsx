@@ -20,6 +20,7 @@ import useScriptRef from 'hooks/useScriptRef';
 
 import { useDispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
+import { userApi } from 'e-courrier/api/administrationApi';
 
 // ========================|| FIREBASE - FORGOT PASSWORD ||======================== //
 
@@ -35,18 +36,19 @@ const AuthForgotPassword = ({ ...others }) => {
         <Formik
             initialValues={{ email: '', submit: null }}
             validationSchema={Yup.object().shape({
-                email: Yup.string().email('Must be a valid email').max(255).required('Email is required')
+                email: Yup.string().email('Doit être une adresse e-mail valide').max(255).required('L\'adresse e-mail est requise')
             })}
             onSubmit={async (values, { setErrors, setStatus, setSubmitting }) => {
                 try {
-                    await resetPassword(values.email).then(
+                    // Utiliser le nouvel endpoint avec l'email dans le corps de la requête
+                    await userApi.sendResetPasswordEmailByEmail({ email: values.email }).then(
                         () => {
                             setStatus({ success: true });
                             setSubmitting(false);
                             dispatch(
                                 openSnackbar({
                                     open: true,
-                                    message: 'Check mail for reset password link',
+                                    message: 'Vérifiez votre e-mail pour le lien de réinitialisation du mot de passe',
                                     variant: 'alert',
                                     alert: { color: 'success' },
                                     close: false
@@ -80,7 +82,7 @@ const AuthForgotPassword = ({ ...others }) => {
             {({ errors, handleBlur, handleChange, handleSubmit, isSubmitting, touched, values }) => (
                 <form noValidate onSubmit={handleSubmit} {...others}>
                     <FormControl fullWidth error={Boolean(touched.email && errors.email)} sx={{ ...theme.typography.customInput }}>
-                        <InputLabel htmlFor="outlined-adornment-email-forgot">Email Address / Username</InputLabel>
+                        <InputLabel htmlFor="outlined-adornment-email-forgot">Adresse e-mail / Nom d'utilisateur</InputLabel>
                         <OutlinedInput
                             id="outlined-adornment-email-forgot"
                             type="email"
@@ -88,7 +90,7 @@ const AuthForgotPassword = ({ ...others }) => {
                             name="email"
                             onBlur={handleBlur}
                             onChange={handleChange}
-                            label="Email Address / Username"
+                            label="Adresse e-mail / Nom d'utilisateur"
                             inputProps={{}}
                         />
                         {touched.email && errors.email && (
@@ -115,7 +117,7 @@ const AuthForgotPassword = ({ ...others }) => {
                                 variant="contained"
                                 color="secondary"
                             >
-                                Send Mail
+                                Envoyer
                             </Button>
                         </AnimateButton>
                     </Box>
