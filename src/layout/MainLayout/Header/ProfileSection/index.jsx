@@ -183,10 +183,15 @@ const ProfileSection = () => {
                                                 </Stack>
                                                 <Stack direction="row" spacing={1} alignItems="center">
                                                     <Typography variant="subtitle2">
-                                                        {defaultProfile ? `${defaultProfile.profileName} (${defaultProfile.strName})` : 'Aucun profil par défaut'}
+                                                        {defaultProfile ? defaultProfile.profileName : 'Aucun profil par défaut'}
                                                     </Typography>
                                                     {defaultProfile && <StarIcon fontSize="small" color="warning" />}
                                                 </Stack>
+                                                {defaultProfile && (
+                                                    <Typography variant="caption" color="textSecondary">
+                                                        ({defaultProfile.strName})
+                                                    </Typography>
+                                                )}
                                             </Stack>
                                             <Divider />
                                         </Box>
