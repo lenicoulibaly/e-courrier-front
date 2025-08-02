@@ -1,0 +1,105 @@
+Implementons la gestion des des structures.
+1 - La liste paginée des structures
+    a - Endpoint de recherche des structures : /structures/search?key=&typeCode=MIN&page=0&size=10 (utiliser useStructures({key: '', typeCode: 'MIN', page: 0, size: 10}}
+    b - Présentation :
+        La liste doit avoir au dessus d'elle un champ de recherche multicritère pour le paramètre key,
+        Une autocomplete de filtre par type de structure pour le paramètre typeCode (utiliser useTypesByGroupCode("STR") pour les items de l'autocomplete)
+        Totalement en haut à droite, un bouton sans label avec icon + pour ajouter une nouvelle structure. Le bouton doit avoir un tooltip
+        Le clique sur le bouton + doit denclencher le formulaire d'ajout d'une structure dans une fenetre modal (src/e-courrier/components/commons/Modal.jsx)
+        Les boutons de pagination doivent apparaitre en bas du tableau avec le nombre total d'items a l'extreme gauche. (Utiliser src/e-courrier/components/commons/Pagination.jsx)
+        Chaque ligne du tableau doit avoir les boutons d'action modifier, Changer l'ancrage institutionnel. Ces boutons doivent être représentés par des icones qui les decrivent bien et un tooltip
+    C - DTO :
+    {
+      "strId": 123,
+      "strName": "Structure Principale", //(Afficher)
+      "strSigle": "SP",
+
+      "strTypeName": "Direction Générale", //(Afficher)
+      "strTypeCode": "DG",
+      "strTel": "+2250700000000", //(Afficher)
+      "strAddress": "Abidjan, Plateau", //(Afficher)
+      "situationGeo": "5.348, -4.007", //(Afficher)
+
+      "parentId": 1,
+      "parentName": "Ministère de tutelle", //(Afficher)
+      "parentSigle": "MT",
+      "strLevel": 2,
+
+      "respoId": 10,
+      "respoName": "Koffi Jean",
+      "respoMatricule": "MATR12345",
+
+      "chaineSigles": "MT/SP" //(Afficher en sous titre en bas du strName)
+    }
+2 - Le formulaire de création :
+    a - Il doit s'afficher dans une modale (src/e-courrier/components/commons/Modal.jsx)
+    b - DTO :
+        {
+          "strId": 101,                        // Inclure uniquement pour une mise à jour (UpdateGroup)
+          "strName": "Direction Financière",
+          "strSigle": "DF",
+          "typeCode": "DIR",                  // Par exemple : "DIR" = Direction
+          "parentId": 100,                    // Peut être nul si structure racine
+          "strTel": "+2250102030405",
+          "strAddress": "Abidjan, Cocody",
+          "situationGeo": "5.336,-4.024"
+        }
+    C- Hook de persistence : useCreateStructure
+    D - Fonctionnement :
+        - L'utilisateur saisi le nom de la structure, le sigle.
+        - Il selectionne le type à partir d'une autocomplete (utiliser useTypesByGroupCode("STR"))
+        - Il selectionne le parent de la structure qu'il souhaite créer à partir d'une Autocomplete (usePossibleParents({childTypeCode: typeCode}))
+            L'autocomplete des structures parents doit être vide au départ
+            A chaque fois que le type de la structure est changé plus haut, rafraichir l'autocomplete des structures parents avec le typeCode du type sélectionné.
+        - Il saisit les autres informations (strTel, strAddress, situationGeo)
+        - Quand l'utilisateur clique sur enregistrer, proposer une fenetre de confirmation avec src/e-courrier/components/commons/CustomAlertDialog.jsx
+        - Après la confirmation, afficher toujours un feedback avec src/e-courrier/components/commons/FloatingAlert.jsx (Qui doit disparaître après 3 secondes en cas de succès et 7 secondes en cas d'échec)
+        - Les messages d'erreur viennent sous forme de tableau de string dans .response.data
+
+3 - Le formulaire de modification :
+    a - Il doit s'afficher dans une modale (src/e-courrier/components/commons/Modal.jsx)
+    b - DTO :
+        {
+          "strId": 101,                        // Inclure uniquement pour une mise à jour (UpdateGroup)
+          "strName": "Direction Financière",
+          "strSigle": "DF",
+          "strTel": "+2250102030405",
+          "strAddress": "Abidjan, Cocody",
+          "situationGeo": "5.336,-4.024"
+        }
+    C- Hook de persistence : useUpdateStructure
+    D - Fonctionnement :
+        - Précharger les informations de la structure sélectionnée à partir de la liste (pas besoin de requête vers le back)
+        - L'utilisateur saisi les informations qu'il souhaite modifier
+        - Quand l'utilisateur clique sur enregistrer, proposer une fenetre de confirmation avec src/e-courrier/components/commons/CustomAlertDialog.jsx
+        - Après la confirmation, afficher toujours un feedback avec src/e-courrier/components/commons/FloatingAlert.jsx (Qui doit disparaître après 3 secondes en cas de succès et 7 secondes en cas d'échec)
+        - Les messages d'erreur viennent sous forme de tableau de string dans .response.data
+
+4 - Le formulaire de changement d'ancrage institutionnel :
+    a - Il doit s'afficher dans une modale (src/e-courrier/components/commons/Modal.jsx)
+    b - DTO :
+        {
+          "strId": 150,
+          "typeCode": "DIR",
+          "parentId": 100,
+          "strName": "Direction Technique",
+          "strSigle": "DT",
+          "strTel": "+2250700001111",
+          "strAddress": "Abidjan, Zone industrielle",
+          "situationGeo": "5.339,-4.034"
+        }
+    C- Hook de persistence :     useChangeAnchor
+    D - Fonctionnement :
+        - Précharger les informations de la structure sélectionnée  à partir de la liste  (pas besoin de requête vers le back)
+        - L'utilisateur saisi le nom de la structure, le sigle.
+                - Il selectionne le type à partir d'une autocomplete (utiliser useTypesByGroupCode("STR"))
+                - Il selectionne le parent de la structure qu'il souhaite créer à partir d'une Autocomplete (usePossibleParents({childTypeCode: typeCode}))
+                    L'autocomplete des structures parents doit être vide au départ
+                    A chaque fois que le type de la structure est changé plus haut, rafraichir l'autocomplete des structures parents avec le typeCode du type sélectionné.
+                - Il saisit les autres informations (strTel, strAddress, situationGeo)
+        - Quand l'utilisateur clique sur enregistrer, proposer une fenetre de confirmation avec src/e-courrier/components/commons/CustomAlertDialog.jsx
+                - Après la confirmation, afficher toujours un feedback avec src/e-courrier/components/commons/FloatingAlert.jsx (Qui doit disparaître après 3 secondes en cas de succès et 7 secondes en cas d'échec)
+                - Les messages d'erreur viennent sous forme de tableau de string dans .response.data
+
+5 - Prévoir un élement de menu dans la section administration pour accéder à la liste des structures. Cet élément doit être associé à une icone parlante
+6 - Faire le routage vers cet élément de menu
