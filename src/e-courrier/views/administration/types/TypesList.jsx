@@ -60,6 +60,7 @@ const TypesList = ({ searchTerm, groupCodes, onEditType }) => {
 
     // Handle configure subtypes button click
     const handleConfigureSubtypes = (type) => {
+        console.log(type);
         setSelectedType(type);
         setConfigureSubtypesModalOpen(true);
     };
