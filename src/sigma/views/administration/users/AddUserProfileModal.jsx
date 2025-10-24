@@ -45,8 +45,7 @@ const AddUserProfileModal = ({ open, handleClose, userId, user: propUser }) => {
     const [isCreateError, setIsCreateError] = useState(false);
     const [createErrorMessage, setCreateErrorMessage] = useState('');
 
-    // Use user from props if available
-    const [user] = useState(propUser);
+    // Use user directly from props
 
     // Fetch data for dropdowns
     const { data: structures, isLoading: isLoadingStructures } = useVisibleStructures();
@@ -143,7 +142,7 @@ const AddUserProfileModal = ({ open, handleClose, userId, user: propUser }) => {
         <Modal
             open={open}
             handleClose={handleClose}
-            title={user ? `Ajouter un profil pour ${user.lastName}, ${user.firstName} (${user.email})` : "Ajouter un profil"}
+            title={propUser ? `Ajouter un profil pour ${propUser.lastName}, ${propUser.firstName} (${propUser.email})` : "Ajouter un profil"}
             maxWidth="md"
             handleConfirmation={handleSubmit}
             actionDisabled={!!addProfileMutation.isLoading}

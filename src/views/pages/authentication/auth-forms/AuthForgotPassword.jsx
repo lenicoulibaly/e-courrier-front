@@ -20,7 +20,7 @@ import useScriptRef from 'hooks/useScriptRef';
 
 import { useDispatch } from 'store';
 import { openSnackbar } from 'store/slices/snackbar';
-import { userApi } from 'e-courrier/api/administrationApi';
+import { userApi } from 'src/sigma/api/administrationApi';
 
 // ========================|| FIREBASE - FORGOT PASSWORD ||======================== //
 

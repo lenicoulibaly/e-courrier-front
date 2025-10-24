@@ -36,12 +36,12 @@ const verifyToken = (serviceToken) => {
 
 const setSession = (authResponse) => {
     if (authResponse) {
-        localStorage.setItem('e-courrier-access-token', authResponse.accessToken);
-        localStorage.setItem('e-courrier-refresh-token', authResponse.refreshToken);
+        localStorage.setItem('sigma-access-token', authResponse.accessToken);
+        localStorage.setItem('sigma-refresh-token', authResponse.refreshToken);
         apiClient.defaults.headers.common.Authorization = `Bearer ${authResponse.accessToken}`;
     } else {
-        localStorage.removeItem('e-courrier-access-token');
-        localStorage.removeItem('e-courrier-refresh-token');
+        localStorage.removeItem('sigma-access-token');
+        localStorage.removeItem('sigma-refresh-token');
         delete apiClient.defaults.headers.common.Authorization;
     }
 };
@@ -55,7 +55,7 @@ export const JWTProvider = ({ children }) => {
     useEffect(() => {
         const init = async () => {
             try {
-                const serviceToken = window.localStorage.getItem('e-courrier-access-token');
+                const serviceToken = window.localStorage.getItem('sigma-access-token');
                 if (serviceToken && verifyToken(serviceToken)) {
                     const user  = getUserFromAccessToken(serviceToken);
                     dispatch({

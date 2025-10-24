@@ -26,7 +26,7 @@ import Transitions from 'ui-component/extended/Transitions';
 import UserProfilesModal from './UserProfilesModal';
 import ChangePasswordModal from './ChangePasswordModal';
 import useAuth from 'hooks/useAuth';
-import { useActiveUserProfiles } from 'e-courrier/hooks/query/useAuthorities';
+import { useActiveUserProfiles } from 'src/sigma/hooks/query/useAuthorities';
 import User1 from 'assets/images/users/user-round.svg';
 import { ThemeMode } from 'config';
 

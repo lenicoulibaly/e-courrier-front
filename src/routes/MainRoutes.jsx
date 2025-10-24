@@ -8,14 +8,17 @@ import AuthGuard from 'utils/route-guard/AuthGuard';
 
 import { loader as productsLoader, productLoader } from 'api/products';
 
-// e-courrier administration routing
-const TypesManagement = Loadable(lazy(() => import('e-courrier/views/administration/types')));
-const StructuresManagement = Loadable(lazy(() => import('e-courrier/views/administration/structures')));
-const PrivilegesManagement = Loadable(lazy(() => import('e-courrier/views/administration/privileges')));
-const RolesManagement = Loadable(lazy(() => import('e-courrier/views/administration/roles')));
-const ProfilesManagement = Loadable(lazy(() => import('e-courrier/views/administration/profiles')));
-const UsersManagement = Loadable(lazy(() => import('e-courrier/views/administration/users')));
-const UserProfiles = Loadable(lazy(() => import('e-courrier/views/administration/users/UserProfiles')));
+// sigma administration routing
+const TypesManagement = Loadable(lazy(() => import('src/sigma/views/administration/types')));
+const StructuresManagement = Loadable(lazy(() => import('src/sigma/views/administration/structures')));
+const PrivilegesManagement = Loadable(lazy(() => import('src/sigma/views/administration/privileges')));
+const RolesManagement = Loadable(lazy(() => import('src/sigma/views/administration/roles')));
+const ProfilesManagement = Loadable(lazy(() => import('src/sigma/views/administration/profiles')));
+const UsersManagement = Loadable(lazy(() => import('src/sigma/views/administration/users')));
+const UserProfiles = Loadable(lazy(() => import('src/sigma/views/administration/users/UserProfiles')));
+
+// sigma business routing
+const AssociationsManagement = Loadable(lazy(() => import('src/sigma/views/business/associations')));
 
 // dashboard routing
 const DashboardDefault = Loadable(lazy(() => import('views/dashboard/Default')));
@@ -696,7 +699,7 @@ const MainRoutes = {
             element: <DashboardAnalytics />
         },
 
-        // e-courrier administration routes
+        // sigma administration routes
         {
             path: '/administration/types',
             element: <TypesManagement />
@@ -728,6 +731,12 @@ const MainRoutes = {
         {
             path: '/administration/structures',
             element: <StructuresManagement />
+        },
+
+        // sigma business routes
+        {
+            path: '/associations/list',
+            element: <AssociationsManagement />
         }
     ]
 };

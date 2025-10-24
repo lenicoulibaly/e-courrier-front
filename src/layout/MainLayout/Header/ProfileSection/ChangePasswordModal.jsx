@@ -15,10 +15,10 @@ import {
 } from '@mui/material';
 
 // project imports
-import Modal from 'e-courrier/components/commons/Modal';
-import CustomAlertDialog from 'e-courrier/components/commons/CustomAlertDialog';
-import FloatingAlert from 'e-courrier/components/commons/FloatingAlert';
-import { userApi } from 'e-courrier/api/administrationApi';
+import Modal from 'src/sigma/components/commons/Modal';
+import CustomAlertDialog from 'src/sigma/components/commons/CustomAlertDialog';
+import FloatingAlert from 'src/sigma/components/commons/FloatingAlert';
+import { userApi } from 'src/sigma/api/administrationApi';
 import useAuth from 'hooks/useAuth';
 
 // assets

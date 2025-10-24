@@ -21,7 +21,7 @@ const icons = {
 const administration = {
     id: 'administration',
     title: <FormattedMessage id="administration" />,
-    type: 'group',
+    type: 'collapse',
     icon: icons.IconSettings,
     children: [
         {

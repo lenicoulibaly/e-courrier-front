@@ -1,0 +1,89 @@
+Junie, Je veux tu implémente la liste des associations.
+⚠️ Important :
+
+Utilise les couleurs, styles et composants déjà définis dans le template et le thème global de l’application.
+
+Garde la structure fonctionnelle telle que décrite ci-dessous.
+
+🎯 Objectif
+
+Créer le composant d’interface de la “Liste des associations”, intégré dans le module Associations.
+Le composant doit permettre la consultation, la recherche, la pagination et l’accès aux actions pour chaque association.
+
+🧱 Structure à coder
+🏷️ En-tête de navigation
+
+Fil d’Ariane : Associations > Liste
+
+📋 Bloc principal : “Liste des associations”
+
+Titre : Liste des associations
+
+Barre de recherche : champ texte avec placeholder "Search"
+
+Bouton d’ajout : icône “+” à droite (ouvre la modale d’ajout d’une nouvelle association)
+
+📊 Tableau des associations
+
+Colonnes :
+
+N°
+
+Nom
+
+Sigle
+
+Situation géographique
+
+Droit d’adhésion (FCFA)
+
+Logo
+
+Actions
+
+Exemple de données :
+
+N°	Nom	Sigle	Situation géographique	Droit d’adhésion (FCFA)	Logo	Actions
+1	Mutuelle des Agents des Finances Générales	MAFIB	Abidjan/Plateau/Cité Financière	10 000	(vide ou icône par défaut)	Menu déroulant
+2	Syndicat des Agents des Finances Générales	SYNAFIG	Abidjan/Plateau/Cité Financière	15 000	(vide ou icône par défaut)	Menu déroulant
+⚙️ Menu déroulant “Actions”
+
+Lorsqu’on clique sur “Actions”, le menu doit proposer :
+
+Détails
+
+Modifier
+
+Ajouter une cotisation
+
+Liste des membres
+
+Demandes d’adhésion
+
+Éditer la fiche d’adhésion
+
+Chaque option doit être reliée aux routes, fonctions ou modals déjà définis dans le projet (utilise les conventions existantes).
+
+📄 Pagination
+
+Pagination simple (Utiliser même style de pagination que celui utiliser sur la liste des structures dans src/sigma/views/administration/structures/StructuresList.jsx. Il s'agit du composant src/sigma/components/commons/Pagination.jsx)
+
+
+🎨 Contraintes de design
+
+Respecter la charte graphique du template déjà utilisé dans le projet.
+
+Utiliser les composants standard de l’application pour les boutons, tables, inputs, menus déroulants et pagination.
+
+Le rendu doit être responsive et compatible avec le design system déjà en place.
+
+🧩 Fonctionnalités à inclure
+
+Recherche dynamique (filtre les résultats du tableau en temps réel)
+
+Pagination fonctionnelle
+
+Actions contextuelles via menu déroulant
+
+Le composant doit être placé dans le dossier src/sigma/views/business/associations et doit s'appeler AssociationsList.jsx
+Le sous Menu Associations du Menu Associations doit naviguer vers ce somposant

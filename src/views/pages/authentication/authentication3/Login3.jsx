@@ -13,7 +13,7 @@ import AuthCardWrapper from '../AuthCardWrapper';
 import AuthLogin from '../auth-forms/AuthLogin';
 import Logo from 'ui-component/Logo';
 import AuthFooter from 'ui-component/cards/AuthFooter';
-import useAuth from 'e-courrier/hooks/useAuth';
+import useAuth from 'src/sigma/hooks/useAuth';
 
 // assets
 

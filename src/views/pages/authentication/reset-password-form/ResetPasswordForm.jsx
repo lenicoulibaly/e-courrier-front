@@ -26,8 +26,8 @@ import { useSearchParams } from 'react-router-dom';
 import useScriptRef from 'hooks/useScriptRef';
 import AnimateButton from 'ui-component/extended/AnimateButton';
 import { strengthColor, strengthIndicator } from 'utils/password-strength';
-import { useResetPassword } from 'e-courrier/hooks/query/useUsers';
-import FloatingAlert from 'e-courrier/components/commons/FloatingAlert';
+import { useResetPassword } from 'src/sigma/hooks/query/useUsers';
+import FloatingAlert from 'src/sigma/components/commons/FloatingAlert';
 
 import AuthWrapper1 from '../AuthWrapper1';
 import AuthCardWrapper from '../AuthCardWrapper';

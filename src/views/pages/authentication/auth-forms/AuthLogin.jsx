@@ -23,7 +23,7 @@ import { Formik } from 'formik';
 
 // project imports
 import AnimateButton from 'ui-component/extended/AnimateButton';
-import useAuth from 'e-courrier/hooks/useAuth';
+import useAuth from 'src/sigma/hooks/useAuth';
 import useScriptRef from 'hooks/useScriptRef';
 
 // assets

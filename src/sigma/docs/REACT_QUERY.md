@@ -15,7 +15,7 @@ L'implémentation de React Query dans ce projet est organisée comme suit :
 Le `QueryProvider` est configuré dans `src/e-courrier/providers/QueryProvider.jsx`. Il initialise le client React Query avec des options par défaut et fournit les fonctionnalités de React Query à toute l'application.
 
 ```jsx
-// src/e-courrier/providers/QueryProvider.jsx
+// src/sigma/providers/QueryProvider.jsx
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 
@@ -61,7 +61,7 @@ Ces hooks sont exportés via un fichier index dans `src/e-courrier/hooks/query/i
 Pour récupérer des données, utilisez les hooks de requête :
 
 ```jsx
-import { useUsers, useStructures } from 'e-courrier/hooks/query';
+import { useUsers, useStructures } from 'sigma/hooks/query';
 
 const MyComponent = () => {
     // Récupérer la liste des utilisateurs
@@ -88,7 +88,7 @@ const MyComponent = () => {
 Pour modifier des données, utilisez les hooks de mutation :
 
 ```jsx
-import { useCreateUser, useUpdateUser } from 'e-courrier/hooks/query';
+import { useCreateUser, useUpdateUser } from 'sigma/hooks/query';
 
 const UserForm = () => {
     const createUser = useCreateUser();
@@ -147,7 +147,7 @@ Exemple de migration :
 ```jsx
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { searchUsers } from 'e-courrier/store/slices/userSlice';
+import { searchUsers } from 'sigma/store/slices/userSlice';
 
 const UserList = () => {
     const dispatch = useDispatch();
@@ -172,7 +172,7 @@ const UserList = () => {
 
 **Après (avec React Query) :**
 ```jsx
-import { useUsers } from 'e-courrier/hooks/query';
+import { useUsers } from 'sigma/hooks/query';
 
 const UserList = () => {
     const { data: users, isLoading, error } = useUsers({ page: 0, size: 10 });

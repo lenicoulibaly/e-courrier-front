@@ -10,7 +10,7 @@ import { store, persister } from 'store';
 import * as serviceWorker from 'serviceWorker';
 import reportWebVitals from 'reportWebVitals';
 import { ConfigProvider } from 'contexts/ConfigContext';
-import QueryProvider from 'e-courrier/providers/QueryProvider';
+import QueryProvider from 'src/sigma/providers/QueryProvider';
 
 // style + assets
 import 'assets/scss/style.scss';

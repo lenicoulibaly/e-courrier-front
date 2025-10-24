@@ -26,7 +26,7 @@ import useConfig from 'hooks/useConfig';
 import { useGetMenuMaster } from 'api/menu';
 
 // assets
-import { IconChevronDown, IconChevronRight, IconChevronUp } from '@tabler/icons-react';
+import { IconChevronDown, IconChevronRight, IconChevronUp, IconPlus, IconMinus } from '@tabler/icons-react';
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 
 // horizontal-menu - wrapper
@@ -193,10 +193,10 @@ const NavCollapse = ({ menu, level, parentId }) => {
         />
     );
 
-    const collapseIcon = drawerOpen ? (
-        <IconChevronUp stroke={1.5} size="16px" style={{ marginTop: 'auto', marginBottom: 'auto' }} />
+    const collapseIcon = open ? (
+        <IconMinus stroke={1.5} size="16px" style={{ marginTop: 'auto', marginBottom: 'auto' }} />
     ) : (
-        <IconChevronRight stroke={1.5} size="16px" style={{ marginTop: 'auto', marginBottom: 'auto' }} />
+        <IconPlus stroke={1.5} size="16px" style={{ marginTop: 'auto', marginBottom: 'auto' }} />
     );
 
     const iconSelectedColor = mode === ThemeMode.DARK && drawerOpen ? 'text.primary' : 'secondary.main';
@@ -299,7 +299,7 @@ const NavCollapse = ({ menu, level, parentId }) => {
                         {openMini || open ? (
                             collapseIcon
                         ) : (
-                            <IconChevronDown stroke={1.5} size="16px" style={{ marginTop: 'auto', marginBottom: 'auto' }} />
+                            <IconPlus stroke={1.5} size="16px" style={{ marginTop: 'auto', marginBottom: 'auto' }} />
                         )}
 
                         {!drawerOpen && (
@@ -392,7 +392,7 @@ const NavCollapse = ({ menu, level, parentId }) => {
                             </Typography>
                         }
                     />
-                    {openMini ? <IconChevronRight stroke={1.5} size="16px" /> : <IconChevronDown stroke={1.5} size="16px" />}
+                    {openMini ? <IconMinus stroke={1.5} size="16px" /> : <IconPlus stroke={1.5} size="16px" />}
 
                     {anchorEl && (
                         <PopperStyled

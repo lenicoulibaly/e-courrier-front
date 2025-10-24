@@ -1,0 +1,112 @@
+Utilise les couleurs, composants et styles définis dans le template principal de l’application.
+
+Cette interface doit s’intégrer parfaitement au thème et au design system déjà en place.
+
+🎯 Objectif
+
+Créer le composant/modal “Ajout d’une nouvelle cotisation”, qui permet à un utilisateur d’enregistrer une nouvelle cotisation pour une association.
+Ce composant sera accessible depuis le bouton d'action “Ajouter une cotisation” de la liste des Associations.
+
+🧱 Structure à coder
+🪟 Fenêtre principale
+
+Type : Modal (fenêtre flottante centrée)
+
+Titre du modal : “Ajout d'une nouvelle cotisation”
+
+🧾 Champs du formulaire
+Première ligne (3 champs)
+    Nom
+
+    Type : champ texte
+
+    Placeholder : Cotisation xxx
+
+    Montant
+
+    Type : champ numérique
+
+    Exemple : 5000
+
+    Suffixe (unité) : FCFA (facultatif selon les conventions du template)
+
+    Fréquence des prélèvements
+
+    Type : Liste déroulante (Autocomplete monoselect)
+
+    Exemple : Mensuelle, Trimestrielle, Semestrielle, Annuelle
+
+Deuxième ligne (3 champs)
+
+    Mode de prélèvement (F CFA)
+
+    Type : Liste déroulante (Autocomplete monoselect)
+
+    Exemple : Automatique à la source, Espèce, Mobile money, Chèque, Virement banquaire
+
+    Date de début
+
+    Type : champ de date
+
+    Exemple : 01/01/2025
+
+    Date de fin
+
+    Type : champ de date
+
+    Exemple : 01/01/2030
+
+Deuxième ligne (3 champs)
+    Délais de rigueur (en jours)
+
+    Type : champ numérique
+
+    Exemple : 10
+
+    Association
+
+    Type : champ texte (readonly ou auto-rempli à partire de l'association sur laquelle l'utilisateur a déroulé le bouton d'action). Afficher le nom et le sigle de l'association, mais utiliser le assId de l'association comme valeur
+
+    Exemple : MAFIB
+
+    Section
+
+    Type : liste déroulante avec comme items, les sections de l'association sélectionnée (Autocomplete mono select)
+
+    Exemple : MAFIB/DGMP
+
+    Motif
+
+    Type : zone de texte (textarea)
+
+    Exemple : Soutien aux retraités
+
+🎨 Boutons d’action
+
+Annuler : bouton secondaire (rouge ou couleur d’annulation du template)
+
+Enregistrer : bouton principal (couleur d’action principale du thème)
+
+Ces boutons doivent respecter la disposition et le style standard des boutons d’action du template (alignés à droite).
+
+🧩 Comportement attendu
+
+Validation des champs requis avant enregistrement.
+
+Message d’erreur clair en cas de champ manquant ou invalide.
+
+Au clic sur Enregistrer, soumettre les données via la méthode d’ajout de cotisation existante dans le backend.
+
+Au clic sur Annuler, fermer la fenêtre sans enregistrer.
+
+🧠 Intégration dans le projet
+
+Le composant doit être réutilisable pour d’autres modules de cotisation éventuels. Le même composant sera réutilisé plutard quand on aura développé la liste des cotisations
+
+Respecter les conventions de nommage, d’importation et de style déjà utilisées.
+
+Liaison avec le store ou le service d’état global si nécessaire.
+
+📁 Nom suggéré du composant
+
+src/sigma/views/business/cotisations/CotisationModal.jsx

@@ -3,7 +3,7 @@ import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 // project imports
-import useAuth from 'e-courrier/hooks/useAuth';
+import useAuth from 'src/sigma/hooks/useAuth';
 
 // ==============================|| AUTH GUARD ||============================== //
 

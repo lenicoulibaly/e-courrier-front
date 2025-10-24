@@ -16,12 +16,12 @@ import {
 } from '@mui/material';
 
 // project imports
-import Modal from 'e-courrier/components/commons/Modal';
-import CustomAlertDialog from 'e-courrier/components/commons/CustomAlertDialog';
-import FloatingAlert from 'e-courrier/components/commons/FloatingAlert';
-import { useActiveUserProfiles, useChangeDefaultProfile } from 'e-courrier/hooks/query/useAuthorities';
-import { getUserAuthorities } from 'e-courrier/store/slices/authoritySlice';
-import apiClient from 'e-courrier/api/apiClient';
+import Modal from 'src/sigma/components/commons/Modal';
+import CustomAlertDialog from 'src/sigma/components/commons/CustomAlertDialog';
+import FloatingAlert from 'src/sigma/components/commons/FloatingAlert';
+import { useActiveUserProfiles, useChangeDefaultProfile } from 'src/sigma/hooks/query/useAuthorities';
+import { getUserAuthorities } from 'src/sigma/store/slices/authoritySlice';
+import apiClient from 'src/sigma/api/apiClient';
 import useAuth from 'hooks/useAuth';
 
 // assets
@@ -66,8 +66,8 @@ const UserProfilesModal = ({ open, handleClose, userId }) => {
                     console.log('Received new tokens from changeDefaultProfile');
 
                     // Update localStorage with the new tokens
-                    localStorage.setItem('e-courrier-access-token', data.accessToken);
-                    localStorage.setItem('e-courrier-refresh-token', data.refreshToken);
+                    localStorage.setItem('sigma-access-token', data.accessToken);
+                    localStorage.setItem('sigma-refresh-token', data.refreshToken);
 
                     // Update API client's Authorization header
                     apiClient.defaults.headers.common.Authorization = `Bearer ${data.accessToken}`;

@@ -15,8 +15,8 @@ import userReducer from './slices/user';
 import cartReducer from './slices/cart';
 import kanbanReducer from './slices/kanban';
 
-// e-courrier imports
-import transferListReducer from '../e-courrier/store/slices/transferListSlice';
+// sigma imports
+import transferListReducer from '../sigma/store/slices/transferListSlice';
 
 // ==============================|| COMBINE REDUCER ||============================== //
 

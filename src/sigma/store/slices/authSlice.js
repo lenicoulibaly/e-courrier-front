@@ -4,9 +4,9 @@ import apiClient from '../../api/apiClient';
 // État initial
 const initialState = {
     user: null,
-    token: localStorage.getItem('e-courrier-access-token'),
-    refreshToken: localStorage.getItem('e-courrier-refresh-token'),
-    isAuthenticated: !!localStorage.getItem('e-courrier-access-token'),
+    token: localStorage.getItem('sigma-access-token'),
+    refreshToken: localStorage.getItem('sigma-refresh-token'),
+    isAuthenticated: !!localStorage.getItem('sigma-access-token'),
     isLoading: false,
     error: null
 };
@@ -22,8 +22,8 @@ export const login = createAsyncThunk('auth/login', async ({ username, password 
         const { token, refreshToken, user } = response.data;
 
         // Sauvegarder les tokens
-        localStorage.setItem('e-courrier-access-token', token);
-        localStorage.setItem('e-courrier-refresh-token', refreshToken);
+        localStorage.setItem('sigma-access-token', token);
+        localStorage.setItem('sigma-refresh-token', refreshToken);
 
         return { token, refreshToken, user };
     } catch (error) {
@@ -39,8 +39,8 @@ export const logout = createAsyncThunk('auth/logout', async () => {
         console.warn('Erreur lors de la déconnexion:', error);
     } finally {
         // Nettoyer le localStorage
-        localStorage.removeItem('e-courrier-access-token');
-        localStorage.removeItem('e-courrier-refresh-token');
+        localStorage.removeItem('sigma-access-token');
+        localStorage.removeItem('sigma-refresh-token');
     }
 });
 
@@ -63,8 +63,8 @@ export const refreshToken = createAsyncThunk('auth/refreshToken', async (_, { ge
         const { token, refreshToken: newRefreshToken } = response.data;
 
         // Mettre à jour les tokens
-        localStorage.setItem('e-courrier-access-token', token);
-        localStorage.setItem('e-courrier-refresh-token', newRefreshToken);
+        localStorage.setItem('sigma-access-token', token);
+        localStorage.setItem('sigma-refresh-token', newRefreshToken);
 
         return { token, refreshToken: newRefreshToken };
     } catch (error) {

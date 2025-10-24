@@ -40,6 +40,7 @@ export const StyledDialogTitle = styled(DialogTitle)(({ theme, bgcolor }) => ({
     backgroundColor: bgcolor || theme.palette.secondary.main, // Couleur définie par props ou couleur secondaire par défaut
     color: theme.palette.getContrastText(bgcolor || theme.palette.secondary.main), // Contraste pour une meilleure lisibilité
     height: '50px', // Hauteur explicite
+    position: 'relative', // Pour le positionnement absolu du headerContent
 }));
 
 export const StyledCloseButton = styled(IconButton)(({ theme, bgcolor }) => ({
@@ -53,11 +54,24 @@ export const StyledCloseButton = styled(IconButton)(({ theme, bgcolor }) => ({
 const Modal = ({ open, printVisible=false, newVisible=false,
                    title, handleClose, handleConfirmation, handlePrint, handleNew,
                    children, actionVisible =true, actionDisabled, actionLabel, width,
-                   titleBgColor, printButtonColor, zIndex = 1300}) => {
+                   titleBgColor, printButtonColor, zIndex = 1300, headerContent}) => {
     return (
         <StyledDialog aria-labelledby="customized-dialog-title" open={open} maxWidth={width || 'sm'} fullWidth bgcolor={titleBgColor}>
             <StyledDialogTitle bgcolor={titleBgColor}>
-                <small>{decodeURIComponent(encodeURIComponent(title))}</small>
+                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                    <small>{decodeURIComponent(encodeURIComponent(title))}</small>
+                </Box>
+                {headerContent && (
+                    <Box sx={{ 
+                        position: 'absolute', 
+                        left: '50%', 
+                        top: '50%', 
+                        transform: 'translate(-50%, -50%)',
+                        zIndex: 1
+                    }}>
+                        {headerContent}
+                    </Box>
+                )}
                 {handleClose && (
                     <StyledCloseButton bgcolor={titleBgColor} aria-label="close" onClick={handleClose}>
                         <CloseIcon />
@@ -115,6 +129,7 @@ Modal.propTypes = {
     width: PropTypes.string,
     titleBgColor: PropTypes.string, // Prop pour la couleur de fond de la zone de titre
     handlePrint: PropTypes.func,
+    headerContent: PropTypes.node, // Custom content to display in the header
 };
 
 export default Modal;

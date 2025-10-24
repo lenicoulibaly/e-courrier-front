@@ -13,7 +13,7 @@ import transferListSlice from './slices/transferListSlice';
 
 // Configuration de la persistance
 const persistConfig = {
-    key: 'e-courrier-root',
+    key: 'sigma-root',
     storage,
     whitelist: ['auth'], // Seul le slice auth sera persisté
 };

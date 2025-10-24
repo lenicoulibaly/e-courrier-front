@@ -51,7 +51,10 @@ const loadingMenu = {
 export const Menu = () => {
     const { menu, menuLoading } = useGetMenu();
 
-    if (menuLoading) return loadingMenu;
+    if (menuLoading) {
+        loadingMenu.hidden = true;
+        return loadingMenu;
+    }
 
     const SubChildrenLis = (subChildrenLis) => {
         return subChildrenLis?.map((subList) => {
@@ -87,7 +90,8 @@ export const Menu = () => {
         title: <FormattedMessage id={`${menu?.title}`} />,
         // @ts-ignore
         icon: icons[menu?.icon],
-        children: ChildrenList
+        children: ChildrenList,
+        hidden: true
     };
 
     return menuList;

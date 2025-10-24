@@ -10,6 +10,7 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 // project imports
 import NavItem from './NavItem';
 import NavGroup from './NavGroup';
+import NavCollapse from './NavCollapse';
 import menuItem from 'menu-items';
 import useConfig from 'hooks/useConfig';
 
@@ -43,12 +44,18 @@ const MenuList = () => {
         });
         if (menuLoading) {
             menuItem.items.splice(1, 0, widgetMenu);
-            setMenuItems({ items: [...menuItem.items] });
+            // Filter out hidden items
+            const visibleItems = menuItem.items.filter(item => !item.hidden);
+            setMenuItems({ items: [...visibleItems] });
         } else if (!menuLoading && widgetMenu?.id !== undefined && !isFound) {
             menuItem.items.splice(1, 1, widgetMenu);
-            setMenuItems({ items: [...menuItem.items] });
+            // Filter out hidden items
+            const visibleItems = menuItem.items.filter(item => !item.hidden);
+            setMenuItems({ items: [...visibleItems] });
         } else {
-            setMenuItems({ items: [...menuItem.items] });
+            // Filter out hidden items
+            const visibleItems = menuItem.items.filter(item => !item.hidden);
+            setMenuItems({ items: [...visibleItems] });
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [menuLoading]);
@@ -94,6 +101,15 @@ const MenuList = () => {
                         lastItem={lastItem}
                         remItems={remItems}
                         lastItemId={lastItemId}
+                    />
+                );
+            case 'collapse':
+                return (
+                    <NavCollapse
+                        key={item.id}
+                        menu={item}
+                        level={0}
+                        parentId="root"
                     />
                 );
             default:
